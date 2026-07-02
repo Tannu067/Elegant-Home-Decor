@@ -95,6 +95,45 @@ export const sendReturnStatusEmail = async ({ to, name, returnId, status }) => {
   await sendMail({ to, subject, text });
 };
 
+export const sendPasswordResetEmail = async ({ to, name, resetLink }) => {
+  const hasGmailConfig = process.env.EMAIL_USER && process.env.EMAIL_PASS;
+  if (!hasGmailConfig) {
+    console.log("Password reset email skipped (no EMAIL_USER / EMAIL_PASS)", { to });
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+
+  const subject = "Password Reset - Elegant Home Decor";
+  const text = [
+    `Hi ${name},`,
+    "",
+    "You requested a password reset for your Elegant Home Decor account.",
+    "",
+    `Click the link below to reset your password:`,
+    resetLink,
+    "",
+    "This link will expire in 15 minutes.",
+    "",
+    "If you did not request this, please ignore this email.",
+    "",
+    "- Elegant Home Decor Team"
+  ].join("\n");
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to,
+    subject,
+    text
+  });
+};
+
 export const sendRefundEmail = async ({ to, name, returnId, amount, method }) => {
   const subject = `Refund Completed for Return ${returnId}`;
   const text = [
