@@ -6,6 +6,8 @@ import { addToCart } from "../features/cartSlice.js";
 import LikeButton from "./LikeButton.jsx";
 import { discountPercent, formatCurrency, getImage } from "../utils/format.js";
 
+const LOW_STOCK_THRESHOLD = 5;
+
 export default function ProductCard({ product }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ export default function ProductCard({ product }) {
         <img src={getImage(product)} alt={product.name} />
         <div className="badges">
           {product.bestSeller && <span>Best Seller</span>}
-          {product.stock <= 8 && product.stock > 0 && <span>Low Stock</span>}
+          {product.stock <= LOW_STOCK_THRESHOLD && product.stock > 0 && <span>Low Stock</span>}
           {product.stock === 0 && <span>Out of Stock</span>}
         </div>
       </Link>
@@ -50,10 +52,13 @@ export default function ProductCard({ product }) {
           {product.discountPrice && <span>{formatCurrency(product.price)}</span>}
           {discountPercent(product.price, product.discountPrice) > 0 && <em>{discountPercent(product.price, product.discountPrice)}% Off</em>}
         </div>
+        {product.stock > 0 && product.stock <= LOW_STOCK_THRESHOLD && (
+          <p className="low-stock-note">Only {product.stock} left!</p>
+        )}
         <div className="card-actions">
           <button className="button compact" onClick={buyNow} disabled={product.stock === 0}>
             <ShoppingBag size={17} />
-            Buy
+            {product.stock === 0 ? "Out of Stock" : "Buy"}
           </button>
           <LikeButton product={product} />
         </div>

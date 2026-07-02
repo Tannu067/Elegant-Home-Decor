@@ -37,6 +37,8 @@ const emptyThemeForm = {
   isActive: true
 };
 
+const LOW_STOCK_THRESHOLD = 5;
+
 export default function AdminDashboard() {
   const [active, setActive] = useState("overview");
   const [stats, setStats] = useState(null);
@@ -45,12 +47,14 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [festiveThemes, setFestiveThemes] = useState([]);
+  const [lowStockProducts, setLowStockProducts] = useState([]);
 
   const loadAdminData = () => {
     api.get("/admin/stats").then(({ data }) => setStats(data)).catch(() => {});
     api.get("/admin/orders").then(({ data }) => setOrders(data)).catch(() => {});
     api.get("/admin/users").then(({ data }) => setUsers(data)).catch(() => {});
     api.get("/admin/products").then(({ data }) => setProducts(data)).catch(() => {});
+    api.get("/admin/low-stock").then(({ data }) => setLowStockProducts(data)).catch(() => {});
     api.get("/categories").then(({ data }) => setCategories(data)).catch(() => {});
     api.get("/admin/festive/all").then(({ data }) => setFestiveThemes(data)).catch(() => {});
   };
@@ -129,10 +133,11 @@ export default function AdminDashboard() {
           {active === "inventory" && (
             <section className="dashboard-panel">
               <h1>Inventory Alerts</h1>
-              {(stats?.lowStockProducts || []).map((product) => (
+              {lowStockProducts.length === 0 && <p style={{ color: "var(--muted)" }}>All products are well-stocked.</p>}
+              {lowStockProducts.map((product) => (
                 <div className="inventory-line" key={product._id}>
                   <span>{product.name}</span>
-                  <strong>{product.stock} Left</strong>
+                  <strong className={product.stock === 0 ? "stock-out" : "stock-low"}>{product.stock} Left</strong>
                 </div>
               ))}
             </section>
@@ -339,6 +344,12 @@ function ProductManager({ categories, products, onProductsChange, onCategoriesCh
 }
 
 function ProductTable({ products, onEdit, onDelete }) {
+  const stockClass = (stock) => {
+    if (stock === 0) return "stock-out";
+    if (stock <= LOW_STOCK_THRESHOLD) return "stock-low";
+    return "";
+  };
+
   return (
     <div className="table-wrap">
       <table>
@@ -347,12 +358,12 @@ function ProductTable({ products, onEdit, onDelete }) {
         </thead>
         <tbody>
           {products.map((product) => (
-            <tr key={product._id}>
+            <tr key={product._id} className={stockClass(product.stock) ? `stock-row-${stockClass(product.stock)}` : ""}>
               <td>{product.images?.[0]?.url && <img className="admin-product-thumb" src={product.images[0].url} alt={product.name} />}</td>
               <td>{product.name}</td>
               <td>{product.category?.name || "Uncategorized"}</td>
               <td>{formatCurrency(product.discountPrice || product.price)}</td>
-              <td>{product.stock}</td>
+              <td className={stockClass(product.stock)}>{product.stock}</td>
               <td>
                 <div className="table-actions">
                   <button type="button" className="icon-button" onClick={() => onEdit(product)} aria-label="Edit Product"><Edit3 size={17} /></button>

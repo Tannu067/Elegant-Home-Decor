@@ -1672,6 +1672,41 @@ th {
   border-radius: 8px;
 }
 
+.low-stock-note {
+  color: var(--rose);
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin: 4px 0;
+}
+
+.stock-low {
+  color: #d97706 !important;
+  font-weight: 700;
+}
+
+.stock-out {
+  color: #dc2626 !important;
+  font-weight: 700;
+}
+
+.stock-row-stock-low {
+  background: #fffbeb;
+}
+
+.stock-row-stock-out {
+  background: #fef2f2;
+}
+
+.stock-row-stock-low td:first-child,
+.stock-row-stock-out td:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.stock-row-stock-low td:last-child,
+.stock-row-stock-out td:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
 .contact-layout {
   grid-template-columns: 0.9fr 1.1fr;
 }

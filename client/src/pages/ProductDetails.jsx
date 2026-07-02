@@ -11,6 +11,8 @@ import ProductGrid from "../components/ProductGrid.jsx";
 import LikeButton from "../components/LikeButton.jsx";
 import { discountPercent, formatCurrency, getImage } from "../utils/format.js";
 
+const LOW_STOCK_THRESHOLD = 5;
+
 export default function ProductDetails() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -203,23 +205,26 @@ export default function ProductDetails() {
             <p><strong>Fabric:</strong> {product.fabric}</p>
             <p><strong>Care:</strong> {product.care}</p>
             <p><strong>Availability:</strong> {product.stock > 0 ? `${product.stock} in Stock` : "Out of Stock"}</p>
+            {product.stock > 0 && product.stock <= LOW_STOCK_THRESHOLD && (
+              <p className="low-stock-note">Only {product.stock} left!</p>
+            )}
           </div>
           <div className="quantity-control">
             <button onClick={() => setOptions((current) => ({ ...current, quantity: Math.max(1, current.quantity - 1) }))}>
               <Minus size={16} />
             </button>
             <span>{options.quantity}</span>
-            <button onClick={() => setOptions((current) => ({ ...current, quantity: current.quantity + 1 }))}>
+            <button onClick={() => setOptions((current) => ({ ...current, quantity: Math.min(product.stock || 1, current.quantity + 1) }))}>
               <Plus size={16} />
             </button>
           </div>
           <div className="detail-actions">
             <button className="button primary" disabled={product.stock === 0} onClick={add}>
               <ShoppingBag size={18} />
-              Add to Cart
+              {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
             </button>
             <button className="button secondary" disabled={product.stock === 0} onClick={buyNow}>
-              Buy Now
+              {product.stock === 0 ? "Out of Stock" : "Buy Now"}
             </button>
             <LikeButton
               product={product}
