@@ -4,16 +4,11 @@ const hasGmailConfig = () => process.env.EMAIL_USER && process.env.EMAIL_PASS;
 
 const getGmailTransporter = () => {
   if (!hasGmailConfig()) return null;
-  return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    family: 4,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
+  const encodedUser = encodeURIComponent(process.env.EMAIL_USER);
+  const encodedPass = encodeURIComponent(process.env.EMAIL_PASS);
+  return nodemailer.createTransport(
+    `smtps://${encodedUser}:${encodedPass}@smtp.gmail.com:465`
+  );
 };
 
 const hasSmtpConfig = () => process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
