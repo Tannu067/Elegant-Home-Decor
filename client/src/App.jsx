@@ -20,6 +20,8 @@ import Contact from "./pages/Contact.jsx";
 import FAQ from "./pages/FAQ.jsx";
 import PolicyPage from "./pages/PolicyPage.jsx";
 import Login from "./pages/Login.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import { FestiveThemeProvider } from "./context/FestiveThemeContext.jsx";
 
@@ -48,6 +50,8 @@ function SiteLayout() {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/track-order" element={<TrackOrder />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />

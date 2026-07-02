@@ -108,6 +108,7 @@ export default function Login() {
               )}
               <input type="email" placeholder="Email" value={form.email} onChange={(event) => update("email", event.target.value)} required />
               <PasswordInput placeholder="Password" value={form.password} onChange={(event) => update("password", event.target.value)} required />
+              {mode === "login" && <Link to="/forgot-password" className="auth-continue" style={{ justifySelf: "end", marginTop: "-14px" }}>Forgot Password?</Link>}
               <button className="button primary full auth-submit" disabled={loading}>
                 {loading ? "Please Wait..." : mode === "login" ? "Login" : "Register"}
               </button>
