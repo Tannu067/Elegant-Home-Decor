@@ -82,6 +82,13 @@ export const createOrder = asyncHandler(async (req, res) => {
     prices.coupon.usedCount += 1;
     await prices.coupon.save();
   }
+
+  try {
+    await sendOrderConfirmationEmail({ to: req.user.email, name: req.user.name, order });
+  } catch (emailErr) {
+    console.error("Order confirmation email failed:", emailErr.message);
+  }
+
   res.status(201).json(order);
 });
 
@@ -125,7 +132,12 @@ export const createGuestOrder = asyncHandler(async (req, res) => {
     await prices.coupon.save();
   }
 
-  await sendOrderConfirmationEmail({ to: guestInfo.email, order });
+  try {
+    await sendOrderConfirmationEmail({ to: guestInfo.email, name: guestInfo.fullName, order });
+  } catch (emailErr) {
+    console.error("Guest order confirmation email failed:", emailErr.message);
+  }
+
   res.status(201).json(order);
 });
 
