@@ -52,7 +52,10 @@ const uploadProductImages = async (files = []) => {
   }));
 };
 
+const getLowStockThreshold = () => Number(process.env.LOW_STOCK_THRESHOLD) || 5;
+
 export const getDashboardStats = asyncHandler(async (_req, res) => {
+  const threshold = getLowStockThreshold();
   const [totalSalesAgg, totalOrders, totalUsers, totalProducts, totalCategories, lowStockProducts, recentOrders] =
     await Promise.all([
       Order.aggregate([{ $match: { isPaid: true } }, { $group: { _id: null, total: { $sum: "$totalPrice" } } }]),
@@ -60,7 +63,7 @@ export const getDashboardStats = asyncHandler(async (_req, res) => {
       User.countDocuments({ role: "user" }),
       Product.countDocuments(),
       Category.countDocuments(),
-      Product.find({ stock: { $lte: 8 } }).select("name stock slug images").limit(8),
+      Product.find({ stock: { $lte: threshold } }).select("name stock slug images").limit(8),
       Order.find().populate("user", "name email").sort({ createdAt: -1 }).limit(8)
     ]);
 
@@ -116,6 +119,14 @@ export const updateAdminProduct = asyncHandler(async (req, res) => {
   }
 
   res.json(await (await product.save()).populate("category", "name slug"));
+});
+
+export const getLowStockProducts = asyncHandler(async (_req, res) => {
+  const threshold = getLowStockThreshold();
+  const products = await Product.find({ stock: { $lte: threshold } })
+    .populate("category", "name slug")
+    .sort({ stock: 1 });
+  res.json(products);
 });
 
 export const deleteAdminProduct = asyncHandler(async (req, res) => {

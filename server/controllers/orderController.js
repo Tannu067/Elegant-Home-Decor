@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import Coupon from "../models/Coupon.js";
-import { sendOrderConfirmationEmail } from "../utils/email.js";
+import { sendOrderConfirmationEmail, sendLowStockAlert } from "../utils/email.js";
 
 const sanitizeOrderItems = (items) =>
   items.map((item) => {
@@ -52,6 +52,49 @@ const calculatePrices = async (items, couponCode) => {
   };
 };
 
+const getLowStockThreshold = () => Number(process.env.LOW_STOCK_THRESHOLD) || 5;
+
+const validateAndDecrementStock = async (items, res) => {
+  const threshold = getLowStockThreshold();
+
+  for (const item of items) {
+    if (!/^[a-fA-F0-9]{24}$/.test(item.product)) continue;
+
+    const product = await Product.findById(item.product).select("name stock");
+    if (!product) {
+      res.status(400);
+      throw new Error("Product not found");
+    }
+
+    if (product.stock < item.quantity) {
+      const msg =
+        product.stock === 0
+          ? `${product.name} is out of stock`
+          : `Only ${product.stock} left in stock for ${product.name}`;
+      res.status(400);
+      throw new Error(msg);
+    }
+
+    const updated = await Product.findByIdAndUpdate(
+      item.product,
+      { $inc: { stock: -item.quantity } },
+      { new: true, select: "name stock" }
+    );
+
+    if (updated && updated.stock <= threshold && product.stock > threshold) {
+      try {
+        await sendLowStockAlert({
+          productName: updated.name,
+          stock: updated.stock,
+          threshold
+        });
+      } catch (emailErr) {
+        console.error("Low stock email alert failed:", emailErr.message);
+      }
+    }
+  }
+};
+
 export const createOrder = asyncHandler(async (req, res) => {
   let { orderItems, shippingAddress, paymentMethod, couponCode } = req.body;
   if (!orderItems?.length) {
@@ -61,6 +104,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   orderItems = sanitizeOrderItems(orderItems);
   const prices = await calculatePrices(orderItems, couponCode);
+  await validateAndDecrementStock(orderItems, res);
   const order = await Order.create({
     user: req.user._id,
     orderItems,
@@ -106,6 +150,7 @@ export const createGuestOrder = asyncHandler(async (req, res) => {
 
   orderItems = sanitizeOrderItems(orderItems);
   const prices = await calculatePrices(orderItems, couponCode);
+  await validateAndDecrementStock(orderItems, res);
   console.log("[GuestOrder] Calculated prices:", prices);
   const order = await Order.create({
     is_guest: true,

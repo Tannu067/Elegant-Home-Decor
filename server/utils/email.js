@@ -274,6 +274,29 @@ export const sendPasswordResetEmail = async ({ to, name, resetLink }) => {
   });
 };
 
+export const sendLowStockAlert = async ({ productName, stock, threshold }) => {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+  if (!adminEmail) {
+    console.log("Low stock alert skipped (no ADMIN_EMAIL / EMAIL_USER)");
+    return;
+  }
+
+  const subject = `Low Stock Alert: ${productName}`;
+  const text = [
+    `Low Stock Alert`,
+    ``,
+    `Product: ${productName}`,
+    `Current Stock: ${stock}`,
+    `Threshold: ${threshold}`,
+    ``,
+    `This product is running low on stock. Please restock soon.`,
+    ``,
+    `- Elegant Home Decor`,
+  ].join("\n");
+
+  await sendMail({ to: adminEmail, subject, text });
+};
+
 export const sendRefundEmail = async ({ to, name, returnId, amount, method }) => {
   const subject = `Refund Completed for Return ${returnId}`;
   const text = [

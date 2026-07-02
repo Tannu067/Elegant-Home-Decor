@@ -6,6 +6,7 @@ import {
   getAllOrders,
   getAllUsers,
   getDashboardStats,
+  getLowStockProducts,
   updateAdminProduct
 } from "../controllers/adminController.js";
 import {
@@ -35,6 +36,7 @@ router.get("/orders", getAllOrders);
 router.put("/orders/:id/status", updateOrderStatus);
 router.put("/orders/:id/deliver", markDelivered);
 router.get("/users", getAllUsers);
+router.get("/low-stock", getLowStockProducts);
 router.route("/products").get(getAdminProducts).post(upload.array("images", 8), createAdminProduct);
 router.route("/products/:id").put(upload.array("images", 8), updateAdminProduct).delete(deleteAdminProduct);
 router.get("/reviews", getAllReviews);
