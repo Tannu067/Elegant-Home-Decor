@@ -1,35 +1,11 @@
 import { Helmet } from "react-helmet-async";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import api from "../services/api.js";
 import { categories as fallbackCategories, products as fallbackProducts } from "../data/fallbackCatalog.js";
 import FilterSidebar from "../components/FilterSidebar.jsx";
 import ProductGrid from "../components/ProductGrid.jsx";
 import Loader from "../components/Loader.jsx";
-
-const COLLAGE_BY_CATEGORY = {
-  "table-covers": [
-    { src: "https://res.cloudinary.com/djligggal/image/upload/v1782654298/nataliya-smirnova-H9mg9aDTdaQ-unsplash_nfhgus.jpg", alt: "Ivory Table Cover" },
-    { src: "https://res.cloudinary.com/djligggal/image/upload/v1782654653/ed-inal-Q3XVJVyJ6Y4-unsplash_phzg0h.jpg", alt: "Jacquard Fabric Texture" },
-    { src: "https://res.cloudinary.com/djligggal/image/upload/v1782655229/bruno-ngarukiye-ZsmSKZOF_SA-unsplash_j9tsj7.jpg", alt: "Festive Table Runner" },
-  ],
-  "cushion-covers": [
-    { src: "https://res.cloudinary.com/djligggal/image/upload/v1782654756/lucas-de-moura-b0kTwnDM1O0-unsplash_z0di7l.jpg", alt: "Sage Cushion Covers" },
-    { src: "https://res.cloudinary.com/djligggal/image/upload/v1782654902/mariah-krafft--qOa0YYfdGo-unsplash_koitma.jpg", alt: "Decorative Cushion Covers" },
-    { src: "https://res.cloudinary.com/djligggal/image/upload/v1782654298/nataliya-smirnova-H9mg9aDTdaQ-unsplash_nfhgus.jpg", alt: "Ivory Table Cover" },
-  ],
-  "aprons": [
-    { src: "https://res.cloudinary.com/djligggal/image/upload/v1782655012/golden-horn-bridge-dOQeGVGNmpk-unsplash_qpgwe1.jpg", alt: "Linen Apron" },
-    { src: "https://res.cloudinary.com/djligggal/image/upload/v1782655118/golden-horn-bridge-R_00GMyo2CE-unsplash_ynj6ji.jpg", alt: "Person Wearing Apron" },
-    { src: "https://res.cloudinary.com/djligggal/image/upload/v1782654756/lucas-de-moura-b0kTwnDM1O0-unsplash_z0di7l.jpg", alt: "Sage Cushion Covers" },
-  ],
-};
-
-const DEFAULT_COLLAGE = [
-  { src: "https://res.cloudinary.com/djligggal/image/upload/v1782654298/nataliya-smirnova-H9mg9aDTdaQ-unsplash_nfhgus.jpg", alt: "Ivory Table Cover" },
-  { src: "https://res.cloudinary.com/djligggal/image/upload/v1782654756/lucas-de-moura-b0kTwnDM1O0-unsplash_z0di7l.jpg", alt: "Sage Cushion Covers" },
-  { src: "https://res.cloudinary.com/djligggal/image/upload/v1782655012/golden-horn-bridge-dOQeGVGNmpk-unsplash_qpgwe1.jpg", alt: "Artisan Linen Apron" },
-];
 
 const EYEBROW_BY_CATEGORY = {
   "table-covers": "Table Covers",
@@ -43,19 +19,58 @@ const HEADING_BY_CATEGORY = {
   "aprons": "Artisan Aprons for Kitchen & Beyond",
 };
 
-function PageHeroCollage({ category }) {
-  const images = COLLAGE_BY_CATEGORY[category] || DEFAULT_COLLAGE;
+function AnimatedWords({ text, baseDelay = 0, wordDelay = 0.07 }) {
+  const words = text.split(" ");
+  return words.map((word, i) => (
+    <span
+      key={`${word}-${i}`}
+      className="word"
+      style={{
+        display: "inline-block",
+        animation: `wordFadeSlideUp 0.45s ease-out both`,
+        animationDelay: `${baseDelay + i * wordDelay}s`,
+      }}
+    >
+      {word}{i < words.length - 1 ? "\u00A0" : ""}
+    </span>
+  ));
+}
+
+function PageHeroCollage({ products = [] }) {
+  const productImages = useMemo(
+    () => products.filter((p) => p.images?.length).map((p) => p.images[0]),
+    [products],
+  );
+  const [offset, setOffset] = useState(0);
+
+  const resetOffset = useCallback(() => setOffset(0), []);
+
+  useEffect(() => {
+    resetOffset();
+    if (productImages.length <= 3) return;
+    const id = setInterval(() => {
+      setOffset((prev) => (prev + 1) % productImages.length);
+    }, 4500);
+    return () => clearInterval(id);
+  }, [productImages.length, resetOffset]);
+
+  function pick(index) {
+    if (!productImages.length) return { url: "", alt: "" };
+    return productImages[(offset + index) % productImages.length];
+  }
+
   return (
     <div className="page-hero-collage" aria-hidden="true">
       <div className="collage-row">
-        {images.map((img, i) => (
-          <div
-            key={img.src}
-            className={`collage-box ${i === 0 ? "collage-square-1" : i === 1 ? "collage-rectangle" : "collage-square-2"}`}
-          >
-            <img className="collage-img" src={img.src} alt={img.alt} />
-          </div>
-        ))}
+        {[0, 1, 2].map((i) => {
+          const img = pick(i);
+          const cls = i === 0 ? "collage-square-1" : i === 1 ? "collage-rectangle" : "collage-square-2";
+          return (
+            <div key={i} className={`collage-box ${cls}`}>
+              {img.url ? <img className="collage-img" src={img.url} alt={img.alt} /> : null}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -106,10 +121,20 @@ export default function Products() {
       <section className="page-hero compact-hero">
         <div className="container page-hero-content">
           <div className="page-hero-text" key={filters.category || "all"}>
-            <span className="eyebrow shop-hero-line" style={{ animationDelay: "0s" }}>{EYEBROW_BY_CATEGORY[filters.category] || "Shop Collection"}</span>
-            <h1 className="shop-hero-line" style={{ animationDelay: "0.15s" }}>{HEADING_BY_CATEGORY[filters.category] || "Premium Fabric Decor for Every Room"}</h1>
+            {(() => {
+              const eyebrow = EYEBROW_BY_CATEGORY[filters.category] || "Shop Collection";
+              const heading = HEADING_BY_CATEGORY[filters.category] || "Premium Fabric Decor for Every Room";
+              const eyebrowWords = eyebrow.split(" ").length;
+              const headingStart = Math.max(0, (eyebrowWords - 1) * 0.07 + 0.45);
+              return (
+                <>
+                  <span className="eyebrow"><AnimatedWords text={eyebrow} baseDelay={0} wordDelay={0.07} /></span>
+                  <h1><AnimatedWords text={heading} baseDelay={headingStart} wordDelay={0.07} /></h1>
+                </>
+              );
+            })()}
           </div>
-          <PageHeroCollage category={filters.category} />
+          <PageHeroCollage category={filters.category} products={products} />
         </div>
       </section>
       <section className="container listing-layout">
