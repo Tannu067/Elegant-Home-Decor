@@ -1065,8 +1065,9 @@ textarea {
   to { opacity: 1; transform: translateX(0); }
 }
 
-.shop-hero-line {
-  animation: shopFadeSlideUp 0.55s ease-out both;
+@keyframes wordFadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .shop-filter-sidebar {
