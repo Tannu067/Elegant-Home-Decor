@@ -7,6 +7,7 @@ import { categories as fallbackCategories, products as fallbackProducts } from "
 import HeroSection from "../components/HeroSection.jsx";
 import CategoryCard from "../components/CategoryCard.jsx";
 import ProductGrid from "../components/ProductGrid.jsx";
+import HorizontalScrollCarousel from "../components/HorizontalScrollCarousel.jsx";
 import TestimonialCard from "../components/TestimonialCard.jsx";
 
 export default function Home() {
@@ -46,11 +47,11 @@ export default function Home() {
       </section>
       <section className="band">
         <div className="container section">
-          <div className="section-heading">
-            <span className="eyebrow">Best Sellers</span>
-            <h2>Customer-Loved Finishing Touches</h2>
-          </div>
-          <ProductGrid products={bestSellers.length ? bestSellers : products.slice(0, 4)} />
+          <HorizontalScrollCarousel
+            products={bestSellers.length ? bestSellers : products.slice(0, 4)}
+            title="Customer-Loved Finishing Touches"
+            eyebrow="Best Sellers"
+          />
         </div>
       </section>
       <section className="container section split-offer">
