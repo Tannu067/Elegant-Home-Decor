@@ -5,13 +5,14 @@ import ProductCard from "./ProductCard.jsx";
 export default function SlidingCarousel({ products, title, eyebrow = "New Arrivals" }) {
   const viewportRef = useRef(null);
   const trackRef = useRef(null);
+  const resumeTimerRef = useRef(null);
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [timerKey, setTimerKey] = useState(0);
   const [noTransition, setNoTransition] = useState(false);
   const [visibleCount, setVisibleCount] = useState(4);
-  const dragRef = useRef({ dragging: false, startX: 0, startScroll: 0 });
-  const resumeTimerRef = useRef(null);
+  const dragRef = useRef({ dragging: false, startX: 0 });
+  const gap = 22;
 
   const clearResumeTimer = () => {
     if (resumeTimerRef.current) {
@@ -44,9 +45,10 @@ export default function SlidingCarousel({ products, title, eyebrow = "New Arriva
     };
   }, [updateVisibleCount]);
 
-  const totalSlides = Math.max(1, Math.ceil(products.length / visibleCount));
-  const isInfinite = totalSlides > 1 && products.length > visibleCount;
-  const extendedProducts = isInfinite ? [...products, ...products.slice(0, visibleCount)] : products;
+  const totalSlides = products.length;
+  const isInfinite = totalSlides > 1;
+  const clonedCount = isInfinite ? visibleCount : 0;
+  const extendedProducts = isInfinite ? [...products, ...products.slice(0, clonedCount)] : products;
 
   useEffect(() => {
     if (isPaused || !isInfinite) return;
@@ -64,10 +66,13 @@ export default function SlidingCarousel({ products, title, eyebrow = "New Arriva
     }
   };
 
-  const step = viewportRef.current?.offsetWidth || 0;
+  const vw = viewportRef.current?.offsetWidth || 0;
+  const step = vw ? (vw - (visibleCount - 1) * gap) / visibleCount + gap : 0;
 
   const goTo = (dir) => {
     if (!isInfinite) return;
+    setIsPaused(true);
+    clearResumeTimer();
     setTimerKey((k) => k + 1);
     setCurrent((prev) => {
       let next = prev + dir;
@@ -75,11 +80,12 @@ export default function SlidingCarousel({ products, title, eyebrow = "New Arriva
       if (next >= totalSlides) next = 0;
       return next;
     });
+    startResumeTimer();
   };
 
   const handleDragStart = (clientX) => {
     if (!isInfinite) return;
-    dragRef.current = { dragging: true, startX: clientX, startScroll: current };
+    dragRef.current = { dragging: true, startX: clientX };
     setIsPaused(true);
     clearResumeTimer();
   };
@@ -103,7 +109,7 @@ export default function SlidingCarousel({ products, title, eyebrow = "New Arriva
   const dotIndex = current >= totalSlides ? 0 : current;
 
   return (
-    <section onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
+    <section onMouseEnter={() => { setIsPaused(true); clearResumeTimer(); }} onMouseLeave={() => { clearResumeTimer(); setIsPaused(false); }}>
       <div className="section-heading">
         <span className="eyebrow">{eyebrow}</span>
         <h2>{title}</h2>
@@ -130,7 +136,7 @@ export default function SlidingCarousel({ products, title, eyebrow = "New Arriva
             className="sliding-track"
             style={{
               transform: step ? `translateX(-${current * step}px)` : "none",
-              transition: noTransition ? "none" : "transform 0.5s ease"
+              transition: noTransition ? "none" : "transform 0.6s ease-in-out"
             }}
             onTransitionEnd={handleTransitionEnd}
           >
@@ -153,7 +159,14 @@ export default function SlidingCarousel({ products, title, eyebrow = "New Arriva
             <button
               key={i}
               className={`slide-dot${i === dotIndex ? " active" : ""}`}
-              onClick={() => { setTimerKey((k) => k + 1); setCurrent(i); }}
+              onClick={() => {
+                if (!isInfinite) return;
+                setIsPaused(true);
+                clearResumeTimer();
+                setTimerKey((k) => k + 1);
+                setCurrent(i);
+                startResumeTimer();
+              }}
               aria-label={`Go to slide ${i + 1}`}
             />
           ))}
