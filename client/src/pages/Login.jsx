@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { login, register } from "../features/authSlice.js";
 import { addToCart } from "../features/cartSlice.js";
+import { toggleWishlist } from "../features/wishlistSlice.js";
 import ErrorMessage from "../components/ErrorMessage.jsx";
 import PasswordInput from "../components/PasswordInput.jsx";
 import api from "../services/api.js";
@@ -54,6 +55,9 @@ export default function Login() {
 
         if (pendingAction.type === "addToWishlist" && pendingAction.productId) {
           await api.post(`/products/${pendingAction.productId}/like`);
+          if (pendingAction.product) {
+            dispatch(toggleWishlist(pendingAction.product));
+          }
           toast.success("Added to Wishlist");
         }
       } catch (error) {

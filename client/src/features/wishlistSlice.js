@@ -18,9 +18,13 @@ const wishlistSlice = createSlice({
       const exists = state.items.some((item) => item._id === action.payload._id);
       state.items = exists ? state.items.filter((item) => item._id !== action.payload._id) : [...state.items, action.payload];
       persist(state.items);
+    },
+    removeFromWishlist(state, action) {
+      state.items = state.items.filter((item) => item._id !== action.payload._id);
+      persist(state.items);
     }
   }
 });
 
-export const { addToWishlist, toggleWishlist } = wishlistSlice.actions;
+export const { addToWishlist, removeFromWishlist, toggleWishlist } = wishlistSlice.actions;
 export default wishlistSlice.reducer;

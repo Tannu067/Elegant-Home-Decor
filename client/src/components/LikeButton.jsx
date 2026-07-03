@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../services/api.js";
 import { savePendingAction } from "../utils/pendingAction.js";
-import { toggleWishlist } from "../features/wishlistSlice.js";
+import { toggleWishlist, addToWishlist, removeFromWishlist } from "../features/wishlistSlice.js";
 
 export default function LikeButton({ product, onChange, showCount = true }) {
   const user = useSelector((state) => state.auth.user);
@@ -70,7 +70,7 @@ export default function LikeButton({ product, onChange, showCount = true }) {
       const { data } = await api.post(`/products/${productKey}/like`);
       setLiked(data.liked);
       setLikesCount(data.likesCount);
-      dispatch(toggleWishlist(product));
+      dispatch(data.liked ? addToWishlist(product) : removeFromWishlist(product));
       onChange?.({ liked: data.liked, likesCount: data.likesCount });
     } catch (error) {
       setLiked(previousLiked);
