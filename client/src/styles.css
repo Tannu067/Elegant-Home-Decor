@@ -127,22 +127,37 @@ img {
 }
 
 .navbar {
-  height: 76px;
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
-  gap: 22px;
+  min-height: 80px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  gap: clamp(16px, 2vw, 30px);
+  padding-block: 8px;
 }
 
 .brand {
+  flex: 0 0 clamp(280px, 24vw, 320px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 800;
   font-size: 1.35rem;
   letter-spacing: -0.01em;
-  padding-right: 32px;
+  padding-right: 0;
+  min-width: 0;
+  white-space: nowrap;
 }
 
-.brand span {
+.brand-logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  flex: none;
+}
+
+.brand-name {
   color: var(--primary-color);
+  white-space: nowrap;
 }
 
 .nav-menu,
@@ -159,9 +174,17 @@ img {
 }
 
 .nav-menu {
-  gap: 18px;
+  flex: 1 1 auto;
+  justify-content: center;
+  gap: clamp(12px, 1.5vw, 20px);
   font-size: 0.95rem;
   color: var(--muted);
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.nav-menu a {
+  white-space: nowrap;
 }
 
 .nav-menu a.active,
@@ -178,6 +201,11 @@ img {
   border: 1px solid var(--line);
   padding: 10px 12px;
   border-radius: 8px;
+}
+
+.nav-search {
+  flex: 0 0 clamp(240px, 20vw, 280px);
+  width: clamp(240px, 20vw, 280px);
 }
 
 .nav-search input,
@@ -199,11 +227,13 @@ textarea {
   border: 0;
   background: transparent;
   padding: 0;
-  min-width: 130px;
+  min-width: 0;
 }
 
 .nav-actions {
+  flex: 0 0 auto;
   gap: 10px;
+  margin-left: auto;
 }
 
 .icon-button,
@@ -260,6 +290,7 @@ textarea {
   color: var(--primary-color);
   cursor: pointer;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .menu-toggle {

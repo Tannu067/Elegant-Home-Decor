@@ -54,13 +54,13 @@ export default function Navbar() {
           <button className="icon-button menu-toggle" onClick={() => setOpen(!open)} aria-label="Toggle Navigation">
             {open ? <X /> : <Menu />}
           </button>
-          <Link to="/" className="brand" onClick={close} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Link to="/" className="brand" onClick={close}>
             <img
               src="https://res.cloudinary.com/djligggal/image/upload/v1782812327/ChatGPT_Image_Jun_30_2026_03_08_25_PM_drkks8.png"
               alt="Elegant Home Decor"
-              style={{ height: '48px', width: 'auto', objectFit: 'contain' }}
+              className="brand-logo"
             />
-            <span>Elegant</span> Home Decor
+            <span className="brand-name">Elegant Home Decor</span>
           </Link>
           <div className="nav-menu">
             <NavLink to="/products">Shop</NavLink>
