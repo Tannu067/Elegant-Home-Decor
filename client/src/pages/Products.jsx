@@ -1,5 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import api from "../services/api.js";
 import { categories as fallbackCategories, products as fallbackProducts } from "../data/fallbackCatalog.js";
@@ -37,8 +38,8 @@ function AnimatedWords({ text, baseDelay = 0, wordDelay = 0.07 }) {
 }
 
 function PageHeroCollage({ products = [] }) {
-  const productImages = useMemo(
-    () => products.filter((p) => p.images?.length).map((p) => p.images[0]),
+  const allImages = useMemo(
+    () => products.filter((p) => p.images?.length).flatMap((p) => p.images),
     [products],
   );
   const [offset, setOffset] = useState(0);
@@ -47,16 +48,16 @@ function PageHeroCollage({ products = [] }) {
 
   useEffect(() => {
     resetOffset();
-    if (productImages.length <= 3) return;
+    if (!allImages.length) return;
     const id = setInterval(() => {
-      setOffset((prev) => (prev + 1) % productImages.length);
-    }, 4500);
+      setOffset((prev) => (prev + 1) % allImages.length);
+    }, 2800);
     return () => clearInterval(id);
-  }, [productImages.length, resetOffset]);
+  }, [allImages.length, resetOffset]);
 
   function pick(index) {
-    if (!productImages.length) return { url: "", alt: "" };
-    return productImages[(offset + index) % productImages.length];
+    if (!allImages.length) return { url: "", alt: "" };
+    return allImages[(offset + index) % allImages.length];
   }
 
   return (
@@ -67,7 +68,20 @@ function PageHeroCollage({ products = [] }) {
           const cls = i === 0 ? "collage-square-1" : i === 1 ? "collage-rectangle" : "collage-square-2";
           return (
             <div key={i} className={`collage-box ${cls}`}>
-              {img.url ? <img className="collage-img" src={img.url} alt={img.alt} /> : null}
+              <AnimatePresence>
+                {img.url && (
+                  <motion.div
+                    key={img.url}
+                    className="collage-img-wrap"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.45, ease: "easeInOut" }}
+                  >
+                    <img className="collage-img" src={img.url} alt={img.alt} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           );
         })}

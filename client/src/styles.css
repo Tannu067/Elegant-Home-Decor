@@ -1115,6 +1115,31 @@ textarea {
   border: 3px solid white;
   overflow: hidden;
   background: transparent;
+  position: relative;
+  transition: box-shadow 0.35s ease;
+}
+
+.collage-box:hover {
+  box-shadow: 0 12px 28px rgba(65,50,32,0.18);
+}
+
+@keyframes kenBurns {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+.collage-img-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.collage-img-wrap .collage-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  animation: kenBurns 8s ease-out forwards;
 }
 
 .collage-square-1 {
@@ -1133,13 +1158,6 @@ textarea {
   flex: 0 0 110px;
   height: 100%;
   transform: rotate(2deg);
-}
-
-.collage-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
 }
 
 @media (max-width: 1050px) {
