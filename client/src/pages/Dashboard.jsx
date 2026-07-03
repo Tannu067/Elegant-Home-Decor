@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { AnimatePresence, motion } from "framer-motion";
 import { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -8,6 +9,12 @@ import DashboardSidebar from "../components/DashboardSidebar.jsx";
 import ProductGrid from "../components/ProductGrid.jsx";
 import OrderStatusBadge from "../components/OrderStatusBadge.jsx";
 import { formatCurrency } from "../utils/format.js";
+
+const pageVariants = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } },
+  exit: { opacity: 0, y: -10, transition: { duration: 0.15, ease: "easeIn" } },
+};
 
 export default function Dashboard() {
   const user = useSelector((state) => state.auth.user);
@@ -30,90 +37,100 @@ export default function Dashboard() {
       <section className="container dashboard-layout">
         <DashboardSidebar active={active} setActive={setActive} />
         <div className="dashboard-content">
-          {active === "profile" && (
-            <Panel title="Profile Details">
-              <div className="profile-grid">
-                <p><span>Name</span><strong>{user?.name}</strong></p>
-                <p><span>Email</span><strong>{user?.email}</strong></p>
-                <p><span>Phone</span><strong>{user?.phone || "Add Phone Number"}</strong></p>
-              </div>
-              <PasswordForm />
-            </Panel>
-          )}
-          {active === "orders" && (
-            <Panel title="My Orders">
-              {orders.length ? (
-                <div className="table-wrap">
-                  <table>
-                    <thead>
-                      <tr><th>Date</th><th>Order</th><th>Total</th><th>Status</th><th>Paid</th><th>Items</th></tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((order) => (
-                        <Fragment key={order._id}>
-                          <tr>
-                            <td className="text-nowrap">{new Date(order.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
-                            <td>{order.orderNumber || order._id.slice(-8).toUpperCase()}</td>
-                            <td>{formatCurrency(order.totalPrice)}</td>
-                            <td><OrderStatusBadge status={order.orderStatus} /></td>
-                            <td>{order.isPaid ? "Paid" : "Pending"}</td>
-                            <td>
-                              <button
-                                className="button ghost small"
-                                onClick={() => setExpandedOrders((prev) => ({ ...prev, [order._id]: !prev[order._id] }))}
-                              >
-                                {expandedOrders[order._id] ? "Hide" : `View (${order.orderItems.length})`}
-                              </button>
-                            </td>
-                          </tr>
-                          {expandedOrders[order._id] && (
-                            <tr className="order-items-row">
-                              <td colSpan={6}>
-                                <div className="order-items-list">
-                                  {order.orderItems.map((item, idx) => {
-                                    const slug = item.product?.slug;
-                                    const productLink = slug ? `/products/${slug}` : "#";
-                                    return (
-                                      <div className="order-item-line" key={idx}>
-                                        <img src={item.image} alt={item.name} className="order-item-thumb" />
-                                        <div className="order-item-info">
-                                          <strong>{item.name}</strong>
-                                          <span>Qty: {item.quantity} &times; {formatCurrency(item.price)}</span>
-                                          {item.color && <span>Color: {item.color}</span>}
-                                          {item.size && <span>Size: {item.size}</span>}
-                                        </div>
-                                        {order.orderStatus === "Delivered" && (
-                                          <Link to={productLink} state={{ writeReview: true }} className="button secondary small">
-                                            Write Review
-                                          </Link>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="empty-state">No Orders Yet.</div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active}
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              {active === "profile" && (
+                <Panel title="Profile Details">
+                  <div className="profile-grid">
+                    <p><span>Name</span><strong>{user?.name}</strong></p>
+                    <p><span>Email</span><strong>{user?.email}</strong></p>
+                    <p><span>Phone</span><strong>{user?.phone || "Add Phone Number"}</strong></p>
+                  </div>
+                  <PasswordForm />
+                </Panel>
               )}
-            </Panel>
-          )}
-          {active === "wishlist" && (
-            <Panel title="Wishlist">
-              <ProductGrid products={wishlist} />
-            </Panel>
-          )}
-          {active === "addresses" && (
-            <Panel title="Saved Addresses">
-              <AddressManager addresses={addresses} setAddresses={setAddresses} />
-            </Panel>
-          )}
+              {active === "orders" && (
+                <Panel title="My Orders">
+                  {orders.length ? (
+                    <div className="table-wrap">
+                      <table>
+                        <thead>
+                          <tr><th>Date</th><th>Order</th><th>Total</th><th>Status</th><th>Paid</th><th>Items</th></tr>
+                        </thead>
+                        <tbody>
+                          {orders.map((order) => (
+                            <Fragment key={order._id}>
+                              <tr>
+                                <td className="text-nowrap">{new Date(order.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
+                                <td>{order.orderNumber || order._id.slice(-8).toUpperCase()}</td>
+                                <td>{formatCurrency(order.totalPrice)}</td>
+                                <td><OrderStatusBadge status={order.orderStatus} /></td>
+                                <td>{order.isPaid ? "Paid" : "Pending"}</td>
+                                <td>
+                                  <button
+                                    className="button ghost small"
+                                    onClick={() => setExpandedOrders((prev) => ({ ...prev, [order._id]: !prev[order._id] }))}
+                                  >
+                                    {expandedOrders[order._id] ? "Hide" : `View (${order.orderItems.length})`}
+                                  </button>
+                                </td>
+                              </tr>
+                              {expandedOrders[order._id] && (
+                                <tr className="order-items-row">
+                                  <td colSpan={6}>
+                                    <div className="order-items-list">
+                                      {order.orderItems.map((item, idx) => {
+                                        const slug = item.product?.slug;
+                                        const productLink = slug ? `/products/${slug}` : "#";
+                                        return (
+                                          <div className="order-item-line" key={idx}>
+                                            <img src={item.image} alt={item.name} className="order-item-thumb" />
+                                            <div className="order-item-info">
+                                              <strong>{item.name}</strong>
+                                              <span>Qty: {item.quantity} &times; {formatCurrency(item.price)}</span>
+                                              {item.color && <span>Color: {item.color}</span>}
+                                              {item.size && <span>Size: {item.size}</span>}
+                                            </div>
+                                            {order.orderStatus === "Delivered" && (
+                                              <Link to={productLink} state={{ writeReview: true }} className="button secondary small">
+                                                Write Review
+                                              </Link>
+                                            )}
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            </Fragment>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="empty-state">No Orders Yet.</div>
+                  )}
+                </Panel>
+              )}
+              {active === "wishlist" && (
+                <Panel title="Wishlist">
+                  <ProductGrid products={wishlist} />
+                </Panel>
+              )}
+              {active === "addresses" && (
+                <Panel title="Saved Addresses">
+                  <AddressManager addresses={addresses} setAddresses={setAddresses} />
+                </Panel>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </section>
     </>

@@ -110,6 +110,17 @@ img {
   backdrop-filter: blur(16px);
 }
 
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 30;
+  background: linear-gradient(90deg, var(--primary-color), var(--sage));
+  transform-origin: 0 50%;
+}
+
 .navbar {
   height: 76px;
   display: grid;
@@ -247,6 +258,54 @@ textarea {
 
 .menu-toggle {
   display: none;
+}
+
+.nav-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.nav-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 26;
+  width: 300px;
+  max-width: 80vw;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 24px 32px;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+}
+
+.nav-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.nav-drawer a {
+  padding: 12px 0;
+  font-size: 1rem;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-drawer a.active,
+.nav-drawer a:hover {
+  color: var(--ink);
 }
 
 .hero {
@@ -1668,12 +1727,52 @@ textarea {
   display: grid;
   justify-items: center;
   gap: 12px;
+  position: relative;
+  overflow: hidden;
 }
 
 .success-page svg {
   width: 64px;
   height: 64px;
   color: var(--sage);
+}
+
+.success-checkmark {
+  width: 72px;
+  height: 72px;
+  color: var(--sage);
+}
+
+.success-content {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.success-message {
+  font-size: 1.05rem;
+  margin-bottom: 4px;
+}
+
+.success-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: 0;
 }
 
 .auth-page {
@@ -1764,6 +1863,68 @@ textarea {
 .contact-form {
   display: grid;
   gap: 12px;
+}
+
+.floating-input {
+  position: relative;
+}
+
+.floating-input input,
+.floating-input textarea {
+  width: 100%;
+  padding: 18px 14px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: white;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.floating-input textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.floating-input input:focus,
+.floating-input textarea:focus {
+  border-color: var(--primary-color);
+}
+
+.floating-input label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.95rem;
+  color: var(--muted);
+  pointer-events: none;
+  transition: all 0.2s ease;
+  background: white;
+  padding: 0 4px;
+}
+
+.floating-input textarea ~ label {
+  top: 18px;
+  transform: none;
+}
+
+.floating-input input:focus ~ label,
+.floating-input input:not(:placeholder-shown) ~ label,
+.floating-input textarea:focus ~ label,
+.floating-input textarea:not(:placeholder-shown) ~ label {
+  top: 6px;
+  transform: translateY(0);
+  font-size: 0.75rem;
+  color: var(--primary-color);
+}
+
+.floating-input textarea:focus ~ label,
+.floating-input textarea:not(:placeholder-shown) ~ label {
+  top: 10px;
 }
 
 .auth-panel form {
@@ -2192,17 +2353,41 @@ th {
   grid-template-columns: 0.9fr 1.1fr;
 }
 
-.faq-page details {
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.faq-item {
   border: 1px solid var(--line);
   background: white;
   border-radius: 8px;
   padding: 16px 18px;
-  margin: 12px 0;
+  cursor: pointer;
+  overflow: hidden;
 }
 
-.faq-page summary {
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   font-weight: 800;
-  cursor: pointer;
+  user-select: none;
+}
+
+.faq-chevron {
+  flex-shrink: 0;
+  display: flex;
+  color: var(--muted);
+}
+
+.faq-answer {
+  padding-top: 14px;
+  color: var(--muted);
+  line-height: 1.7;
 }
 
 .footer {
@@ -2264,20 +2449,7 @@ th {
   }
 
   .nav-menu {
-    position: absolute;
-    top: 116px;
-    left: 16px;
-    right: 16px;
     display: none;
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 18px;
-    box-shadow: var(--shadow);
-  }
-
-  .nav-menu.open {
-    display: grid;
   }
 
   .nav-search {
@@ -2450,7 +2622,94 @@ th {
   }
 
   .cart-quantity-stepper,
-  .cart-item-actions {
+.checkout-progress {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 0 8px;
+}
+
+.progress-track {
+  position: relative;
+  height: 3px;
+  background: var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  position: relative;
+}
+
+.step-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.step-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.progress-step.active .step-label {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.progress-step.done .step-label {
+  color: var(--ink);
+}
+
+@media (max-width: 768px) {
+  .checkout-progress {
+    padding: 16px 0 4px;
+  }
+
+  .step-circle {
+    width: 30px;
+    height: 30px;
+  }
+
+  .step-circle svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .step-label {
+    font-size: 0.7rem;
+  }
+}
+
+.cart-item-actions {
     grid-column: 1 / -1;
   }
 

@@ -8,6 +8,7 @@ import CheckoutForm from "../components/CheckoutForm.jsx";
 import StripeCheckoutForm from "../components/StripeCheckoutForm.jsx";
 import { clearCart } from "../features/cartSlice.js";
 import { formatCurrency, getImage } from "../utils/format.js";
+import CheckoutProgress from "../components/CheckoutProgress.jsx";
 
 export default function Checkout({ forceGuestMode = false }) {
   const navigate = useNavigate();
@@ -178,6 +179,7 @@ export default function Checkout({ forceGuestMode = false }) {
           <title>Checkout | Elegant Home Decor</title>
         </Helmet>
         <section className="container success-page">
+          <CheckoutProgress currentStep={1} />
           <span className="eyebrow">Checkout Options</span>
           <h1>Choose How to Checkout</h1>
           <Link className="button primary" to="/login" onClick={() => localStorage.setItem("redirectAfterLogin", "/checkout")}>
@@ -201,6 +203,7 @@ export default function Checkout({ forceGuestMode = false }) {
       </Helmet>
       <section className="container page-layout">
         <div className="checkout-form">
+          <CheckoutProgress currentStep={1} />
           {guestMode && !user && (
             <div className="guest-checkout-form">
               <h2>Guest Details</h2>

@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
+import ScrollProgress from "./components/ScrollProgress.jsx";
 import Footer from "./components/Footer.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import ProtectedAdminRoute from "./routes/ProtectedAdminRoute.jsx";
@@ -42,6 +43,7 @@ function SiteLayout() {
   return (
     <>
       <Navbar />
+      <ScrollProgress />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />

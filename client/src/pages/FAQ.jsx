@@ -1,4 +1,7 @@
 import { Helmet } from "react-helmet-async";
+import { ChevronDown } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
 
 const faqs = [
   ["How Long Does Shipping Take?", "Most Orders Are Dispatched in 1-2 Business Days and Delivered Within 4-7 Business Days."],
@@ -8,18 +11,50 @@ const faqs = [
 ];
 
 export default function FAQ() {
+  const [open, setOpen] = useState(null);
+
+  const toggle = (index) => setOpen(open === index ? null : index);
+
   return (
     <>
       <Helmet><title>FAQ | Elegant Home Decor</title></Helmet>
       <section className="container faq-page">
         <span className="eyebrow">Help Center</span>
         <h1>Frequently Asked Questions</h1>
-        {faqs.map(([question, answer]) => (
-          <details key={question} open>
-            <summary>{question}</summary>
-            <p>{answer}</p>
-          </details>
-        ))}
+        <div className="faq-list">
+          {faqs.map(([question, answer], i) => (
+            <motion.div
+              key={i}
+              layout
+              className="faq-item"
+              onClick={() => toggle(i)}
+            >
+              <div className="faq-question">
+                <span>{question}</span>
+                <motion.span
+                  className="faq-chevron"
+                  animate={{ rotate: open === i ? 180 : 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                >
+                  <ChevronDown size={18} />
+                </motion.span>
+              </div>
+              <AnimatePresence initial={false}>
+                {open === i && (
+                  <motion.div
+                    key="answer"
+                    initial={{ opacity: 0, translateY: -6 }}
+                    animate={{ opacity: 1, translateY: 0 }}
+                    exit={{ opacity: 0, translateY: -6 }}
+                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                  >
+                    <p className="faq-answer">{answer}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))}
+        </div>
       </section>
     </>
   );
