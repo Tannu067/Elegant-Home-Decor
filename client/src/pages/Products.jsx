@@ -123,6 +123,7 @@ export default function Products() {
   const [products, setProducts] = useState(fallbackProducts);
   const [categories, setCategories] = useState(fallbackCategories);
   const [loading, setLoading] = useState(true);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const queryString = useMemo(() => new URLSearchParams(filters).toString(), [filters]);
 
@@ -178,12 +179,15 @@ export default function Products() {
           <PageHeroCollage category={filters.category} products={products} />
         </div>
       </section>
-      <section className="container listing-layout">
+      <section className={`container listing-layout${mobileFiltersOpen ? " mobile-filters" : ""}`}>
         <div className="shop-filter-sidebar" style={{ animationDelay: "0.3s" }}>
           <FilterSidebar filters={filters} setFilters={updateFilters} categories={categories} />
         </div>
         <div className="listing-main">
           <div className="listing-toolbar">
+            <button className="button ghost filter-toggle" onClick={() => setMobileFiltersOpen((v) => !v)}>
+              {mobileFiltersOpen ? "Hide Filters" : "Show Filters"}
+            </button>
             <select value={filters.sort || "newest"} onChange={(event) => updateFilters((current) => ({ ...current, sort: event.target.value }))}>
               <option value="newest">Newest</option>
               <option value="priceAsc">Price: Low to High</option>
