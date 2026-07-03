@@ -1,14 +1,16 @@
 import { Heart } from "lucide-react";
 import { motion, useAnimationControls } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../services/api.js";
 import { savePendingAction } from "../utils/pendingAction.js";
+import { toggleWishlist } from "../features/wishlistSlice.js";
 
 export default function LikeButton({ product, onChange, showCount = true }) {
   const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const initialLiked = useMemo(
@@ -68,6 +70,7 @@ export default function LikeButton({ product, onChange, showCount = true }) {
       const { data } = await api.post(`/products/${productKey}/like`);
       setLiked(data.liked);
       setLikesCount(data.likesCount);
+      dispatch(toggleWishlist(product));
       onChange?.({ liked: data.liked, likesCount: data.likesCount });
     } catch (error) {
       setLiked(previousLiked);
