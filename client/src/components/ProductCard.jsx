@@ -1,19 +1,24 @@
-import { ShoppingBag, Star } from "lucide-react";
+import { Eye, ShoppingBag, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { addToCart } from "../features/cartSlice.js";
 import LikeButton from "./LikeButton.jsx";
 import { discountPercent, formatCurrency, getImage } from "../utils/format.js";
+import { useCartFly } from "../context/CartAnimationContext.jsx";
 
 const LOW_STOCK_THRESHOLD = 5;
 
 export default function ProductCard({ product }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const fly = useCartFly();
   const discounted = product.discountPrice || product.price;
 
-  const buyNow = () => {
+  const handleAddToCart = (event) => {
+    event.stopPropagation();
+    const img = event.currentTarget.closest(".product-card")?.querySelector(".product-image img");
+    if (img) fly(getImage(product), img);
     dispatch(
       addToCart({
         ...product,
@@ -25,19 +30,43 @@ export default function ProductCard({ product }) {
       })
     );
     toast.success("Added to Cart");
+  };
+
+  const buyNow = (event) => {
+    handleAddToCart(event);
     navigate("/checkout");
   };
 
   return (
     <article className="product-card">
-      <Link to={`/products/${product.slug}`} className="product-image">
-        <img src={getImage(product)} alt={product.name} />
-        <div className="badges">
-          {product.bestSeller && <span>Best Seller</span>}
-          {product.stock <= LOW_STOCK_THRESHOLD && product.stock > 0 && <span>Low Stock</span>}
-          {product.stock === 0 && <span>Out of Stock</span>}
+      <div className="product-image-wrap">
+        <Link to={`/products/${product.slug}`} className="product-image">
+          <img src={getImage(product)} alt={product.name} />
+          <div className="badges">
+            {product.bestSeller && <span>Best Seller</span>}
+            {product.stock <= LOW_STOCK_THRESHOLD && product.stock > 0 && <span>Low Stock</span>}
+            {product.stock === 0 && <span>Out of Stock</span>}
+          </div>
+        </Link>
+        <div className="product-actions">
+          <button
+            className="action-btn"
+            onClick={(e) => { e.stopPropagation(); navigate(`/products/${product.slug}`); }}
+            title="Quick View"
+          >
+            <Eye size={16} />
+          </button>
+          <button
+            className="action-btn"
+            onClick={handleAddToCart}
+            disabled={product.stock === 0}
+            title="Add to Cart"
+          >
+            <ShoppingBag size={16} />
+          </button>
+          <LikeButton product={product} showCount={false} />
         </div>
-      </Link>
+      </div>
       <div className="product-body">
         <div className="rating">
           <Star size={15} fill="currentColor" />
@@ -60,7 +89,6 @@ export default function ProductCard({ product }) {
             <ShoppingBag size={17} />
             {product.stock === 0 ? "Out of Stock" : "Buy"}
           </button>
-          <LikeButton product={product} />
         </div>
       </div>
     </article>

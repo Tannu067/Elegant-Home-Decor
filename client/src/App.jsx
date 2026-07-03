@@ -24,13 +24,16 @@ import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import { FestiveThemeProvider } from "./context/FestiveThemeContext.jsx";
+import { CartAnimationProvider } from "./context/CartAnimationContext.jsx";
 
 export default function App() {
   return (
     <FestiveThemeProvider>
-      <Routes>
-        <Route path="*" element={<SiteLayout />} />
-      </Routes>
+      <CartAnimationProvider>
+        <Routes>
+          <Route path="*" element={<SiteLayout />} />
+        </Routes>
+      </CartAnimationProvider>
     </FestiveThemeProvider>
   );
 }

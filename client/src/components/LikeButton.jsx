@@ -1,5 +1,6 @@
 import { Heart } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { motion, useAnimationControls } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -17,11 +18,31 @@ export default function LikeButton({ product, onChange, showCount = true }) {
   const [liked, setLiked] = useState(initialLiked);
   const [likesCount, setLikesCount] = useState(product?.likesCount || product?.likedBy?.length || 0);
   const [loading, setLoading] = useState(false);
+  const controls = useAnimationControls();
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     setLiked(initialLiked);
     setLikesCount(product?.likesCount || product?.likedBy?.length || 0);
   }, [initialLiked, product?.likesCount, product?.likedBy]);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (liked) {
+      controls.start({
+        scale: [1, 1.35, 1],
+        transition: { duration: 0.35, ease: [0.34, 1.56, 0.64, 1], times: [0, 0.3, 1] }
+      });
+    } else {
+      controls.start({
+        scale: [1, 0],
+        transition: { duration: 0.2, ease: "easeIn" }
+      });
+    }
+  }, [liked, controls]);
 
   const toggleLike = async () => {
     if (!user) {
@@ -65,7 +86,16 @@ export default function LikeButton({ product, onChange, showCount = true }) {
       aria-label={liked ? "Unlike Product" : "Like Product"}
       type="button"
     >
-      <Heart size={18} fill={liked ? "currentColor" : "none"} />
+      <motion.span
+        animate={controls}
+        style={{ display: "inline-flex" }}
+      >
+        <Heart
+          size={18}
+          fill={liked ? "currentColor" : "transparent"}
+          style={{ transition: "fill 0.25s ease" }}
+        />
+      </motion.span>
       {showCount && <span>{likesCount}</span>}
     </button>
   );

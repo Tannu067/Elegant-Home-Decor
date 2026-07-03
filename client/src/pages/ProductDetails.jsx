@@ -4,12 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { AnimatePresence, motion } from "framer-motion";
 import api from "../services/api.js";
 import { products as fallbackProducts } from "../data/fallbackCatalog.js";
 import { addToCart } from "../features/cartSlice.js";
 import ProductGrid from "../components/ProductGrid.jsx";
 import LikeButton from "../components/LikeButton.jsx";
 import { discountPercent, formatCurrency, getImage } from "../utils/format.js";
+import { useCartFly } from "../context/CartAnimationContext.jsx";
 
 const LOW_STOCK_THRESHOLD = 5;
 
@@ -88,7 +90,11 @@ export default function ProductDetails() {
     [product]
   );
 
-  const add = () => {
+  const fly = useCartFly();
+
+  const add = (event) => {
+    const img = event.currentTarget.closest(".product-detail")?.querySelector(".zoom-frame img");
+    if (img) fly(getImage(product), img);
     dispatch(
       addToCart({
         ...product,
@@ -100,7 +106,9 @@ export default function ProductDetails() {
     toast.success("Added to Cart");
   };
 
-  const buyNow = () => {
+  const buyNow = (event) => {
+    const img = event.currentTarget.closest(".product-detail")?.querySelector(".zoom-frame img");
+    if (img) fly(getImage(product), img);
     dispatch(
       addToCart({
         ...product,
@@ -148,7 +156,20 @@ export default function ProductDetails() {
       <section className="container product-detail">
         <div className="gallery">
           <div className="zoom-frame">
-            <img src={selectedImage} alt={product.name} />
+            <div className="zoom-inner">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedImage}
+                  className="zoom-image-wrap"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  transition={{ duration: 0.35, ease: "easeInOut" }}
+                >
+                  <img src={selectedImage} alt={product.name} />
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
           <div className="thumb-row">
             {product.images?.map((image) => (
