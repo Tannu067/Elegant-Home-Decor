@@ -307,6 +307,30 @@ textarea {
   margin: 16px 0;
 }
 
+@keyframes heroFadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-heading-line {
+  display: inline-block;
+  animation: heroFadeSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-subtext {
+  animation: heroFadeSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-actions {
+  animation: heroFadeSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .hero p {
   max-width: 650px;
   font-size: 1.14rem;
