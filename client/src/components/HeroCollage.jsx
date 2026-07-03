@@ -29,15 +29,44 @@ const SLOT_STYLES = [
   { top: "64%", left: "2%", width: "32%", aspectRatio: "1 / 1", zIndex: 1, borderRadius: 14, floatDuration: 3.4, floatDelay: 1.4 },
 ];
 
-const CROSSFADE_MS = 2500;
-const LAYOUT_ROTATE_MS = 6000;
+const ROTATE_MS = 2500;
+
+function nextIndex(current, pool) {
+  if (pool.length <= 1) return 0;
+  let next = (current + 1) % pool.length;
+  if (next === current) next = (next + 1) % pool.length;
+  return next;
+}
+
+function KenBurnsImage({ image }) {
+  return (
+    <motion.div
+      className="hero-collage-ken-burns-wrap"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+    >
+      <img
+        src={image.src}
+        alt={image.alt}
+        className="hero-collage-ken-burns-img"
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          display: "block",
+        }}
+      />
+    </motion.div>
+  );
+}
 
 export default function HeroCollage() {
   const prefersReducedMotion = useReducedMotion();
   const stageRef = useRef(null);
   const hoverRef = useRef(false);
   const [alive, setAlive] = useState(true);
-  const [order, setOrder] = useState([0, 1, 2]);
   const [imgIdx, setImgIdx] = useState([0, 0, 0]);
 
   const mouseX = useMotionValue(0);
@@ -85,16 +114,8 @@ export default function HeroCollage() {
   useEffect(() => {
     if (prefersReducedMotion || !alive) return;
     const timer = setInterval(() => {
-      setImgIdx((prev) => prev.map((idx, i) => (idx + 1) % CARDS[i].pool.length));
-    }, CROSSFADE_MS);
-    return () => clearInterval(timer);
-  }, [prefersReducedMotion, alive]);
-
-  useEffect(() => {
-    if (prefersReducedMotion || !alive) return;
-    const timer = setInterval(() => {
-      setOrder((prev) => [prev[2], prev[0], prev[1]]);
-    }, LAYOUT_ROTATE_MS);
+      setImgIdx((prev) => prev.map((idx, i) => nextIndex(idx, CARDS[i].pool)));
+    }, ROTATE_MS);
     return () => clearInterval(timer);
   }, [prefersReducedMotion, alive]);
 
@@ -106,15 +127,13 @@ export default function HeroCollage() {
       onMouseEnter={() => { hoverRef.current = true; setAlive(false); }}
       onMouseLeave={() => { hoverRef.current = false; setAlive(true); }}
     >
-      {order.map((cardIdx, slotIdx) => {
-        const card = CARDS[cardIdx];
+      {CARDS.map((card, slotIdx) => {
         const slot = SLOT_STYLES[slotIdx];
-        const image = card.pool[imgIdx[cardIdx]];
+        const image = card.pool[imgIdx[slotIdx]];
 
         return (
           <motion.div
-            key={card.id}
-            layout
+            key={slotIdx}
             className={`hero-collage-card${slotIdx === 0 ? " hero-collage-card--featured" : ""}`}
             style={{
               position: "absolute",
@@ -125,7 +144,6 @@ export default function HeroCollage() {
               zIndex: slot.zIndex,
               borderRadius: slot.borderRadius,
             }}
-            transition={{ type: "spring", stiffness: 220, damping: 26, mass: 0.9 }}
           >
             <div
               className="hero-collage-card-float"
@@ -152,18 +170,7 @@ export default function HeroCollage() {
               >
                 <div className="hero-collage-card-inner" style={{ borderRadius: slot.borderRadius }}>
                   <AnimatePresence mode="wait">
-                    <motion.img
-                      key={image.src}
-                      src={image.src}
-                      alt={image.alt}
-                      initial={{ opacity: 0, scale: 1.15 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{
-                        opacity: { duration: 0.5, ease: "easeInOut" },
-                        scale: { duration: 2.5, ease: "easeOut" },
-                      }}
-                    />
+                    <KenBurnsImage key={image.src} image={image} />
                   </AnimatePresence>
                 </div>
               </motion.div>

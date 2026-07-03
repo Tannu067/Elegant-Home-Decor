@@ -588,12 +588,26 @@ textarea {
   display: block;
 }
 
+.hero-collage-ken-burns-wrap {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.hero-collage-ken-burns-img {
+  animation: kenBurns 7s ease-out forwards;
+}
+
+.hero-collage-card:hover .hero-collage-ken-burns-img {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-collage-card,
   .hero-collage-card-float {
     animation: none !important;
   }
-  .hero-collage-card-inner img {
+  .hero-collage-ken-burns-img {
     animation: none !important;
   }
 }
