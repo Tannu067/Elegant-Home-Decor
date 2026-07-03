@@ -54,7 +54,7 @@ export default function SlidingCarousel({ products, title, eyebrow = "New Arriva
     if (isPaused || !isInfinite) return;
     const id = setInterval(() => {
       setCurrent((prev) => prev + 1);
-    }, 5000);
+    }, 1000);
     return () => clearInterval(id);
   }, [isPaused, isInfinite, timerKey]);
 

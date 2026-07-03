@@ -10,10 +10,7 @@ export default function CategoryCard({ category }) {
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.unobserve(el);
-        }
+        setVisible(entry.isIntersecting);
       },
       { threshold: 0.35 }
     );
