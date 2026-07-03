@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Award, PackageCheck, RefreshCcw, ShieldCheck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../services/api.js";
 import { categories as fallbackCategories, products as fallbackProducts } from "../data/fallbackCatalog.js";
 import HeroSection from "../components/HeroSection.jsx";
@@ -14,6 +14,8 @@ import TestimonialCard from "../components/TestimonialCard.jsx";
 export default function Home() {
   const [categories, setCategories] = useState(fallbackCategories);
   const [products, setProducts] = useState(fallbackProducts);
+  const seasonalRef = useRef(null);
+  const [seasonalInView, setSeasonalInView] = useState(false);
 
   useEffect(() => {
     Promise.all([api.get("/categories"), api.get("/products?limit=8")])
@@ -22,6 +24,17 @@ export default function Home() {
         setProducts(productRes.data.products?.length ? productRes.data.products : fallbackProducts);
       })
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const el = seasonalRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setSeasonalInView(entry.isIntersecting),
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   const bestSellers = products.filter((product) => product.bestSeller).slice(0, 4);
@@ -55,19 +68,19 @@ export default function Home() {
           />
         </div>
       </section>
-      <section className="container section split-offer">
-        <div>
-          <span className="eyebrow">Seasonal Edit</span>
-          <h2>Host-Ready Dining Layers</h2>
-          <p>
+      <section ref={seasonalRef} className={`container section split-offer${seasonalInView ? " visible" : ""}`}>
+        <div className="seasonal-text-col">
+          <span className="eyebrow seasonal-line" style={{ transitionDelay: "0s" }}>Seasonal Edit</span>
+          <h2 className="seasonal-line" style={{ transitionDelay: "0.15s" }}>Host-Ready Dining Layers</h2>
+          <p className="seasonal-line" style={{ transitionDelay: "0.3s" }}>
             Pair Runners, Table Covers, and Cushion Sets in Tonal Palettes for Festive Meals, Housewarmings, and Intimate
             Family Evenings.
           </p>
-          <Link className="button primary" to="/products?category=table-covers">
+          <Link className="button primary seasonal-line" style={{ transitionDelay: "0.45s" }} to="/products?category=table-covers">
             Shop Dining Decor
           </Link>
         </div>
-        <img src="https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&w=1000&q=80" alt="Seasonal Dining Decor" />
+        <img className="seasonal-img" style={{ transitionDelay: "0.1s" }} src="https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&w=1000&q=80" alt="Seasonal Dining Decor" />
       </section>
       <section className="container section">
         <SlidingCarousel

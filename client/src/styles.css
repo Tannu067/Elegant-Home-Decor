@@ -920,6 +920,28 @@ textarea {
   border-radius: 8px;
 }
 
+.seasonal-text-col .seasonal-line {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s ease-out, transform 0.65s ease-out;
+}
+
+.split-offer.visible .seasonal-text-col .seasonal-line {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.seasonal-img {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.65s ease-out, transform 0.65s ease-out;
+}
+
+.split-offer.visible .seasonal-img {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 .trust-grid {
   grid-template-columns: repeat(4, 1fr);
   padding: 48px 0;
