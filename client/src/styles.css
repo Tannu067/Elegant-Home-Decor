@@ -116,12 +116,22 @@ img {
 .announcement-track {
   display: flex;
   white-space: nowrap;
+  animation: marquee-scroll 15s linear infinite;
   will-change: transform;
 }
 
 .announcement-track > span {
   flex-shrink: 0;
   font-size: 0.88rem;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.33%);
+  }
 }
 
 .site-header {
