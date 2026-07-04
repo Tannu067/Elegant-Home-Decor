@@ -1,4 +1,4 @@
-import { Bookmark, Heart, LayoutDashboard, LogOut, MessageSquare, Package, RotateCcw, Ruler, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { Bookmark, Heart, LayoutDashboard, LogOut, Megaphone, MessageSquare, Package, RotateCcw, Ruler, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { logout } from "../features/authSlice.js";
 import { useNavigate } from "react-router-dom";
@@ -32,6 +32,7 @@ export default function DashboardSidebar({ active, setActive, admin = false }) {
         ["reviews", MessageSquare, "Reviews"],
         ["returns", RotateCcw, "Returns"],
         ["festive", Sparkles, "Festive Themes"],
+        ["announcements", Megaphone, "Announcements"],
         ["orders", Package, "Orders"],
         ["users", UserRound, "Users"],
         ["inventory", ShieldCheck, "Inventory"],

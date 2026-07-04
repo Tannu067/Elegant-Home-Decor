@@ -23,6 +23,7 @@ import festiveRoutes from "./routes/festiveRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import returnRoutes from "./routes/returnRoutes.js";
 import sizeChartRoutes from "./routes/sizeChartRoutes.js";
+import announcementRoutes from "./routes/announcementRoutes.js";
 import { getEmailConfigStatus } from "./utils/email.js";
 
 connectDB();
@@ -90,6 +91,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/returns", returnRoutes);
 app.use("/api/size-charts", sizeChartRoutes);
+app.use("/api/announcements", announcementRoutes);
 app.use("/api", festiveRoutes);
 
 app.use(notFound);

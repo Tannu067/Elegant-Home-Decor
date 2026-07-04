@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useEffect, useRef, useState } from "react";
-import { Bookmark, Check, Edit3, FolderTree, MessageSquare, Plus, Power, RotateCcw, Ruler, Search, ThumbsDown, ThumbsUp, Trash2, Upload, X, Loader2, Star } from "lucide-react";
+import { Bookmark, Check, Edit3, FolderTree, Megaphone, MessageSquare, Plus, Power, RotateCcw, Ruler, Search, ThumbsDown, ThumbsUp, Trash2, Upload, X, Loader2, Star } from "lucide-react";
 import { toast } from "react-toastify";
 import api from "../services/api.js";
 import DashboardSidebar from "../components/DashboardSidebar.jsx";
@@ -159,6 +159,9 @@ export default function AdminDashboard() {
           )}
           {active === "sizecharts" && (
             <SizeChartManager categories={categories} />
+          )}
+          {active === "announcements" && (
+            <AnnouncementManager />
           )}
         </div>
       </section>
@@ -1435,6 +1438,142 @@ function SizeChartManager({ categories }) {
                       <Power size={17} />
                     </button>
                     <button type="button" className="icon-button danger" onClick={() => deleteChart(chart._id)} aria-label="Delete"><Trash2 size={17} /></button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function AnnouncementManager() {
+  const [announcements, setAnnouncements] = useState([]);
+  const [form, setForm] = useState({ text: "", order: 0, isActive: true });
+  const [editing, setEditing] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const loadAnnouncements = () => {
+    api.get("/announcements/all").then(({ data }) => setAnnouncements(data)).catch(() => {});
+  };
+
+  useEffect(() => { loadAnnouncements(); }, []);
+
+  const resetForm = () => {
+    setForm({ text: "", order: 0, isActive: true });
+    setEditing(null);
+  };
+
+  const editItem = (item) => {
+    setEditing(item);
+    setForm({ text: item.text, order: item.order, isActive: item.isActive });
+  };
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!form.text.trim()) return toast.error("Announcement text is required");
+    setSaving(true);
+    try {
+      const { data } = editing
+        ? await api.put(`/announcements/${editing._id}`, form)
+        : await api.post("/announcements", form);
+      if (editing) {
+        setAnnouncements(announcements.map((a) => (a._id === data._id ? data : a)));
+      } else {
+        setAnnouncements([...announcements, data]);
+      }
+      toast.success(editing ? "Announcement updated" : "Announcement created");
+      resetForm();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to save announcement");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteItem = async (id) => {
+    if (!window.confirm("Delete this announcement?")) return;
+    try {
+      await api.delete(`/announcements/${id}`);
+      setAnnouncements(announcements.filter((a) => a._id !== id));
+      toast.success("Announcement deleted");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete");
+    }
+  };
+
+  const toggleActive = async (item) => {
+    try {
+      const { data } = await api.put(`/announcements/${item._id}`, { isActive: !item.isActive });
+      setAnnouncements(announcements.map((a) => (a._id === data._id ? data : a)));
+      toast.success(data.isActive ? "Announcement enabled" : "Announcement disabled");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to toggle");
+    }
+  };
+
+  return (
+    <section className="dashboard-panel">
+      <div className="section-heading inline">
+        <h1>Announcement Bar</h1>
+        <button className="button primary" type="button" onClick={resetForm}><Plus size={18} /> Add Message</button>
+      </div>
+      <form className="admin-form" onSubmit={submit}>
+        <div className="form-grid two-col">
+          <input
+            placeholder="Announcement text"
+            value={form.text}
+            onChange={(e) => setForm((f) => ({ ...f, text: e.target.value }))}
+            required
+          />
+          <input
+            placeholder="Display order (lower = first)"
+            type="number" min="0"
+            value={form.order}
+            onChange={(e) => setForm((f) => ({ ...f, order: Number(e.target.value) }))}
+          />
+        </div>
+        <div className="form-toggle" style={{ marginTop: 8 }}>
+          <label className="toggle-switch">
+            <input type="checkbox" checked={form.isActive} onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))} />
+            <span className="toggle-slider"></span>
+          </label>
+          <span className="toggle-label">Active</span>
+        </div>
+        <div className="button-row" style={{ marginTop: 12 }}>
+          <button className="button primary" type="submit" disabled={saving}>
+            {saving ? "Saving..." : editing ? "Update Message" : "Save Message"}
+          </button>
+          {editing && <button className="button ghost" type="button" onClick={resetForm}>Cancel Edit</button>}
+        </div>
+      </form>
+      <div className="table-wrap" style={{ marginTop: 24 }}>
+        <table>
+          <thead>
+            <tr><th>Order</th><th>Text</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            {announcements.length === 0 && (
+              <tr><td colSpan="4" style={{ textAlign: "center", padding: 24, color: "var(--muted)" }}>No announcements yet</td></tr>
+            )}
+            {announcements.map((item) => (
+              <tr key={item._id}>
+                <td>{item.order}</td>
+                <td>{item.text}</td>
+                <td>
+                  <span className={`status-badge ${item.isActive === false ? "badge-danger" : "badge-success"}`}>
+                    {item.isActive === false ? "Disabled" : "Active"}
+                  </span>
+                </td>
+                <td>
+                  <div className="table-actions">
+                    <button type="button" className="icon-button" onClick={() => editItem(item)} aria-label="Edit"><Edit3 size={17} /></button>
+                    <button type="button" className={`icon-button ${item.isActive === false ? "success" : ""}`} onClick={() => toggleActive(item)} aria-label="Toggle Active">
+                      <Power size={17} />
+                    </button>
+                    <button type="button" className="icon-button danger" onClick={() => deleteItem(item._id)} aria-label="Delete"><Trash2 size={17} /></button>
                   </div>
                 </td>
               </tr>
