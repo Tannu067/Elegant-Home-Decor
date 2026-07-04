@@ -6,13 +6,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { logout } from "../features/authSlice.js";
 import TopBanner from "./TopBanner.jsx";
 
-const CATEGORIES = [
-  { label: "All", path: "/products" },
-  { label: "Table Covers", path: "/products?category=table-covers" },
-  { label: "Cushions", path: "/products?category=cushion-covers" },
-  { label: "Aprons", path: "/products?category=aprons" },
-];
-
 const CAT_IMG = {
   all: "https://res.cloudinary.com/djligggal/image/upload/v1782654298/nataliya-smirnova-H9mg9aDTdaQ-unsplash_nfhgus.jpg",
   "table-covers": "https://res.cloudinary.com/djligggal/image/upload/v1782654653/ed-inal-Q3XVJVyJ6Y4-unsplash_phzg0h.jpg",
@@ -20,7 +13,7 @@ const CAT_IMG = {
   aprons: "https://res.cloudinary.com/djligggal/image/upload/v1782655012/golden-horn-bridge-dOQeGVGNmpk-unsplash_qpgwe1.jpg",
 };
 
-const DRAWER_CATS = [
+const MOBILE_CATS = [
   { label: "All", path: "/products", img: CAT_IMG.all },
   { label: "Table Covers", path: "/products?category=table-covers", img: CAT_IMG["table-covers"] },
   { label: "Cushions", path: "/products?category=cushion-covers", img: CAT_IMG["cushion-covers"] },
@@ -130,10 +123,13 @@ export default function Navbar() {
             <Search size={18} />
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search table covers, cushions, aprons..." />
           </form>
-          <div className="category-chips">
-            {CATEGORIES.map((cat) => (
-              <Link key={cat.label} className="chip" to={cat.path} onClick={close}>
-                {cat.label}
+          <div className="mobile-cat-grid">
+            {MOBILE_CATS.map((cat) => (
+              <Link key={cat.label} to={cat.path} className="mobile-cat-item" onClick={close}>
+                <div className="mobile-cat-img">
+                  <img src={cat.img} alt={cat.label} loading="lazy" />
+                </div>
+                <span>{cat.label}</span>
               </Link>
             ))}
           </div>
@@ -178,16 +174,10 @@ export default function Navbar() {
                   </Link>
                 </div>
               )}
-              <div className="drawer-categories">
-                {DRAWER_CATS.map((cat) => (
-                  <Link key={cat.label} to={cat.path} className="drawer-cat-item" onClick={close}>
-                    <div className="drawer-cat-img">
-                      <img src={cat.img} alt={cat.label} loading="lazy" />
-                    </div>
-                    <span>{cat.label}</span>
-                  </Link>
-                ))}
-              </div>
+              <NavLink to="/products" onClick={close}>Shop</NavLink>
+              <NavLink to="/products?category=table-covers" onClick={close}>Table Covers</NavLink>
+              <NavLink to="/products?category=cushion-covers" onClick={close}>Cushions</NavLink>
+              <NavLink to="/products?category=aprons" onClick={close}>Aprons</NavLink>
               <NavLink to="/about" onClick={close}>About</NavLink>
               <NavLink to="/contact" onClick={close}>Contact</NavLink>
               {user?.role === "admin" && <NavLink to="/admin" onClick={close}>Admin Dashboard</NavLink>}
