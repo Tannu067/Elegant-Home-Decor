@@ -17,9 +17,45 @@ const IMG_POOLS = {
 };
 
 const CARDS = [
-  { id: "table", pool: IMG_POOLS.tableCover, label: "Table Covers", rotation: -1.5, aspectRatio: "13 / 17" },
-  { id: "cushion", pool: IMG_POOLS.cushionCover, label: "Cushion Covers", rotation: 2.5, aspectRatio: "5 / 6" },
-  { id: "apron", pool: IMG_POOLS.apron, label: "Aprons", rotation: -1, aspectRatio: "3 / 4" },
+  {
+    id: "table",
+    pool: IMG_POOLS.tableCover,
+    label: "Table Covers",
+    rotation: -2,
+    aspectRatio: "3 / 4",
+    style: {
+      left: "0%",
+      top: "6%",
+      width: "88%",
+      zIndex: 2,
+    },
+  },
+  {
+    id: "cushion",
+    pool: IMG_POOLS.cushionCover,
+    label: "Cushion Covers",
+    rotation: 4,
+    aspectRatio: "5 / 6",
+    style: {
+      right: "-1%",
+      top: "1%",
+      width: "42%",
+      zIndex: 3,
+    },
+  },
+  {
+    id: "apron",
+    pool: IMG_POOLS.apron,
+    label: "Aprons",
+    rotation: -3,
+    aspectRatio: "3 / 4",
+    style: {
+      right: "0%",
+      bottom: "4%",
+      width: "40%",
+      zIndex: 3,
+    },
+  },
 ];
 
 export default function HeroCollage() {
@@ -45,7 +81,10 @@ export default function HeroCollage() {
         <div
           key={card.id}
           className="hero-collage-card"
-          style={{ transform: `rotate(${card.rotation}deg)` }}
+          style={{
+            ...card.style,
+            transform: `rotate(${card.rotation}deg)`,
+          }}
         >
           <div className="hero-card-inner" style={{ aspectRatio: card.aspectRatio }}>
             <img src={card.pool[imgIdx[i]].src} alt={card.pool[imgIdx[i]].alt} loading="lazy" />

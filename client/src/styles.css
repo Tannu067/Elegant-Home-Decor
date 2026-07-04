@@ -625,28 +625,26 @@ textarea {
 
 .hero-collage-cards {
   position: relative;
-  display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr;
-  gap: 14px;
-  align-items: end;
   width: 100%;
-  max-width: 500px;
+  max-width: 460px;
   margin: 0 auto;
+  aspect-ratio: 5 / 7;
+  align-self: center;
 }
 
 .hero-collage-card {
+  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 0;
 }
 
 .hero-card-inner {
   width: 100%;
-  border-radius: 20px;
-  border: 6px solid #fff;
+  border-radius: 22px;
+  border: 7px solid #fff;
   overflow: hidden;
-  box-shadow: 0 16px 40px rgba(65, 50, 32, 0.15);
+  box-shadow: 0 18px 44px rgba(65, 50, 32, 0.16);
   background: #fff;
 }
 
@@ -2976,21 +2974,19 @@ th {
   }
 
   .hero-collage-cards {
-    grid-template-columns: 1fr;
-    gap: 18px;
     max-width: 340px;
   }
 
   .hero-card-inner {
     border-width: 6px;
-    border-radius: 20px;
+    border-radius: 18px;
   }
 
   .hero-card-label {
     font-size: 0.7rem;
     min-width: 100px;
     padding: 4px 14px;
-    margin-top: 8px;
+    margin-top: 7px;
   }
 
   .page-hero-content {
@@ -3084,8 +3080,6 @@ th {
   }
 
   .hero-collage-cards {
-    grid-template-columns: 1fr;
-    gap: 16px;
     max-width: 280px;
   }
 
@@ -3095,7 +3089,7 @@ th {
 
   .hero-card-inner {
     border-width: 5px;
-    border-radius: 16px;
+    border-radius: 14px;
   }
 
   .hero-card-label {
