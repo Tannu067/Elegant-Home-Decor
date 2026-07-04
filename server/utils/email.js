@@ -1,4 +1,12 @@
 import nodemailer from "nodemailer";
+import dns from "dns";
+
+if (typeof dns.setDefaultResultOrder === "function") {
+  dns.setDefaultResultOrder("ipv4first");
+  console.log("[email] DNS resolution order set to ipv4first");
+} else {
+  console.log("[email] dns.setDefaultResultOrder not available (Node < 17)");
+}
 
 const APP_NAME = "Elegant Home Decor";
 const DEFAULT_FROM_NAME = process.env.MAIL_FROM_NAME || APP_NAME;
@@ -49,27 +57,31 @@ const resolveTransportConfig = () => {
         host: smtpHost,
         port: Number(process.env.SMTP_PORT) || 587,
         secure: parseBool(process.env.SMTP_SECURE, false),
-        auth: {
-          user: smtpUser,
-          pass: smtpPass
-        },
-        family: 4
+        auth: { user: smtpUser, pass: smtpPass },
+        family: 4,
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000
       }
     };
   }
 
   if (emailUser && emailPass) {
+    const port = Number(process.env.EMAIL_SMTP_PORT) || 465;
+    const secure = process.env.EMAIL_SMTP_PORT ? parseBool(process.env.EMAIL_SECURE, port === 465) : true;
+
     return {
       mode: "gmail-app-password",
       config: {
         host: "smtp.gmail.com",
-        port: Number(process.env.EMAIL_SMTP_PORT) || 587,
-        secure: parseBool(process.env.EMAIL_SECURE, false),
-        auth: {
-          user: emailUser,
-          pass: emailPass
-        },
-        family: 4
+        port,
+        secure,
+        auth: { user: emailUser, pass: emailPass },
+        family: 4,
+        requireTLS: !secure,
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000
       }
     };
   }
@@ -91,14 +103,17 @@ const createTransporter = () => {
     return { transporter: null, mode: null, error: transport.error };
   }
 
+  const { host, port, secure, auth } = transport.config;
+  console.log(`[email] creating transporter: mode=${transport.mode} host=${host} port=${port} secure=${secure} user=${auth?.user}`);
+
   const transporter = nodemailer.createTransport(transport.config);
 
   transporter.verify().then((ok) => {
     if (ok) {
-      console.log(`[email] transporter verified (mode: ${transport.mode})`);
+      console.log(`[email] transporter verified: mode=${transport.mode} host=${host} port=${port}`);
     }
   }).catch((err) => {
-    console.warn(`[email] transporter verify() failed — will retry on next send: ${err.message}`);
+    console.warn(`[email] transporter verify() failed (will retry on next send): code=${err.code} message=${err.message}`);
   });
 
   return { transporter, mode: transport.mode, error: null };
@@ -123,7 +138,7 @@ const resetTransporter = () => {
 };
 
 const sendMailWithRetry = async (mailOptions, kind, attempt = 1) => {
-  const { transporter } = getTransporter();
+  const { transporter, mode } = getTransporter();
 
   if (!transporter) {
     return { skipped: true, reason: getEmailConfigStatus().error || "transporter not available" };
@@ -132,11 +147,11 @@ const sendMailWithRetry = async (mailOptions, kind, attempt = 1) => {
   try {
     const info = await transporter.sendMail(mailOptions);
 
-    console.log(`[email] sent ${kind}`, {
+    console.log(`[email] sent ${kind} mode=${mode}`, {
       to: mailOptions.to,
       subject: mailOptions.subject,
       messageId: info.messageId,
-      response: info.response
+      response: info.response?.substring(0, 80)
     });
 
     return { sent: true, messageId: info.messageId };
@@ -144,11 +159,15 @@ const sendMailWithRetry = async (mailOptions, kind, attempt = 1) => {
     const errInfo = {
       code: error.code,
       command: error.command,
-      response: error.response,
-      responseCode: error.responseCode
+      response: error.response?.substring(0, 120),
+      responseCode: error.responseCode,
+      errno: error.errno,
+      syscall: error.syscall,
+      address: error.address,
+      port: error.port
     };
 
-    console.error(`[email] failed ${kind} (attempt ${attempt})`, {
+    console.error(`[email] failed ${kind} (attempt ${attempt}) mode=${mode}`, {
       to: mailOptions.to,
       subject: mailOptions.subject,
       error: error.message,
@@ -156,8 +175,9 @@ const sendMailWithRetry = async (mailOptions, kind, attempt = 1) => {
     });
 
     if (attempt === 1) {
-      console.log(`[email] retrying ${kind} in 1s...`);
-      await new Promise((r) => setTimeout(r, 1000));
+      const delay = error.code === "ENETUNREACH" ? 2000 : 1000;
+      console.log(`[email] retrying ${kind} in ${delay}ms...`);
+      await new Promise((r) => setTimeout(r, delay));
 
       if (!transporterInstance) {
         const result = createTransporter();
@@ -172,7 +192,7 @@ const sendMailWithRetry = async (mailOptions, kind, attempt = 1) => {
       resetTransporter();
     }
 
-    throw error;
+    return { sent: false, error: error.message, code: error.code };
   }
 };
 
@@ -181,6 +201,10 @@ export const getEmailConfigStatus = () => {
   return {
     configured: !transport.error,
     mode: transport.mode || transporterMode || null,
+    port: transport.config?.port || null,
+    secure: transport.config?.secure ?? null,
+    host: transport.config?.host || null,
+    dnsOrder: dns.setDefaultResultOrder ? "ipv4first" : "default",
     error: transport.error || null,
     from: resolveFrom(),
     frontendUrl: getFrontendUrl()
