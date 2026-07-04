@@ -110,11 +110,11 @@ img {
   overflow: hidden;
   width: 100%;
   white-space: nowrap;
-  text-align: left;
+  text-align: right;
 }
 
 .announcement-track {
-  display: flex;
+  display: inline-flex;
   white-space: nowrap;
   animation: marquee-scroll 15s linear infinite;
   will-change: transform;
