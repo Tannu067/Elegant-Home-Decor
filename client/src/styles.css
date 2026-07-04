@@ -114,15 +114,14 @@ img {
 }
 
 .announcement-track {
-  display: inline-block;
+  display: flex;
   white-space: nowrap;
   animation: marquee-scroll 15s linear infinite;
   will-change: transform;
 }
 
 .announcement-track > span {
-  display: inline-block;
-  padding-right: 24px;
+  flex-shrink: 0;
   font-size: 0.88rem;
 }
 
