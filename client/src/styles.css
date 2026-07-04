@@ -3402,7 +3402,7 @@ th {
   }
 
   .brand span {
-    display: none;
+    font-size: 0.75rem;
   }
 
   .menu-toggle {
