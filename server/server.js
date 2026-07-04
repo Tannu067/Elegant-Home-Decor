@@ -28,24 +28,45 @@ import { getEmailConfigStatus } from "./utils/email.js";
 connectDB();
 
 const app = express();
-const frontendOrigin = process.env.CLIENT_URL || process.env.FRONTEND_URL || process.env.VITE_FRONTEND_URL;
-const allowedOrigins = [frontendOrigin, "http://localhost:5173", "http://127.0.0.1:5173"].filter(Boolean);
 
-const vercelOriginRegex = /^https:\/\/.*\.vercel\.app$/;
+const KNOWN_ORIGINS = [
+  process.env.CLIENT_URL,
+  process.env.FRONTEND_URL,
+  process.env.VITE_FRONTEND_URL,
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:3000",
+  "http://localhost:5000"
+].filter(Boolean);
 
-app.use(helmet());
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      if (vercelOriginRegex.test(origin)) return callback(null, true);
-      console.warn(`[cors] rejected origin: ${origin}`);
-      return callback(null, true);
-    },
-    credentials: true
-  })
-);
+const VERCEL_ORIGIN_RE = /^https:\/\/[a-zA-Z0-9_-]+\.vercel\.app$/;
+
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+  if (KNOWN_ORIGINS.includes(origin)) return true;
+  if (VERCEL_ORIGIN_RE.test(origin)) return true;
+  return false;
+};
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (isOriginAllowed(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`[cors] blocked origin: ${origin}`);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV !== "production") app.use(morgan("dev"));
@@ -78,6 +99,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   const emailConfig = getEmailConfigStatus();
   console.log(`API running on port ${PORT}`);
-  console.log("[config] frontend origin:", frontendOrigin || "(not set)");
+  console.log("[config] allowed origins:", KNOWN_ORIGINS.join(", ") || "(not set)");
   console.log("[config] email transport:", emailConfig.configured ? emailConfig.mode : `disabled (${emailConfig.error})`);
 });
