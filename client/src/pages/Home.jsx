@@ -9,8 +9,7 @@ import { categories as fallbackCategories, products as fallbackProducts } from "
 import HeroSection from "../components/HeroSection.jsx";
 import CategoryCard from "../components/CategoryCard.jsx";
 import ProductGrid from "../components/ProductGrid.jsx";
-import HorizontalScrollCarousel from "../components/HorizontalScrollCarousel.jsx";
-import SlidingCarousel from "../components/SlidingCarousel.jsx";
+import NetflixCarousel from "../components/NetflixCarousel.jsx";
 import TestimonialCard from "../components/TestimonialCard.jsx";
 import MagneticButton from "../components/MagneticButton.jsx";
 
@@ -25,7 +24,7 @@ export default function Home() {
   const [testimonialInView, setTestimonialInView] = useState(false);
 
   useEffect(() => {
-    Promise.all([api.get("/categories"), api.get("/products?limit=8")])
+    Promise.all([api.get("/categories"), api.get("/products?limit=12")])
       .then(([categoryRes, productRes]) => {
         setCategories(categoryRes.data.length ? categoryRes.data : fallbackCategories);
         setProducts(productRes.data.products?.length ? productRes.data.products : fallbackProducts);
@@ -66,8 +65,8 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  const bestSellers = products.filter((product) => product.bestSeller).slice(0, 4);
-  const newArrivals = [...products].slice(0, 4);
+  const bestSellers = products.filter((product) => product.bestSeller).slice(0, 8);
+  const newArrivals = [...products].slice(0, 8);
 
   return (
     <>
@@ -90,8 +89,8 @@ export default function Home() {
       </section>
       <section className="band">
         <div className="container section">
-          <HorizontalScrollCarousel
-            products={bestSellers.length ? bestSellers : products.slice(0, 4)}
+          <NetflixCarousel
+            products={bestSellers.length ? bestSellers : products.slice(0, 8)}
             title="Customer-Loved Finishing Touches"
             eyebrow="Best Sellers"
           />
@@ -112,7 +111,7 @@ export default function Home() {
         <img className="seasonal-img" style={{ transitionDelay: "0.1s" }} src="https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&w=1000&q=80" alt="Seasonal Dining Decor" />
       </section>
       <section className="container section">
-        <SlidingCarousel
+        <NetflixCarousel
           products={newArrivals}
           title="Fresh Fabrics for Everyday Beauty"
           eyebrow="New Arrivals"

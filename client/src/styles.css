@@ -1314,6 +1314,119 @@ textarea {
   transform: scale(1.15);
 }
 
+.netflix-carousel {
+  position: relative;
+}
+
+.netflix-carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.netflix-viewport {
+  overflow: hidden;
+  width: 100%;
+  border-radius: 8px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.netflix-viewport:active {
+  cursor: grabbing;
+}
+
+.netflix-track {
+  display: flex;
+  gap: 22px;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.netflix-item {
+  flex: 0 0 calc((100% - 66px) / 4);
+  min-width: 240px;
+  max-width: 310px;
+  transition: transform 280ms ease, box-shadow 280ms ease;
+  border-radius: 8px;
+}
+
+.netflix-item:hover {
+  transform: scale(1.04);
+  box-shadow: 0 12px 32px rgba(65, 50, 32, 0.12);
+}
+
+.netflix-item .product-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.netflix-arrow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 10;
+  width: 52px;
+  background: rgba(30, 25, 20, 0.35);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease, background 0.25s ease;
+  backdrop-filter: blur(2px);
+}
+
+.netflix-carousel-wrapper:hover .netflix-arrow {
+  opacity: 1;
+}
+
+.netflix-arrow:hover {
+  background: rgba(30, 25, 20, 0.55);
+}
+
+.netflix-arrow:active {
+  background: rgba(30, 25, 20, 0.7);
+}
+
+.netflix-arrow-left {
+  left: 0;
+  border-radius: 0 8px 8px 0;
+}
+
+.netflix-arrow-right {
+  right: 0;
+  border-radius: 8px 0 0 8px;
+}
+
+@media (max-width: 1050px) {
+  .netflix-item {
+    flex: 0 0 calc((100% - 44px) / 3);
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 720px) {
+  .netflix-item {
+    flex: 0 0 calc((100% - 22px) / 2);
+    min-width: 160px;
+  }
+
+  .netflix-arrow {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .netflix-item {
+    flex: 0 0 100%;
+    min-width: 0;
+  }
+}
+
 .card-actions {
   justify-content: space-between;
   margin-top: 16px;
