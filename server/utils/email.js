@@ -99,9 +99,7 @@ const resolveTransportConfig = () => {
 
   const baseGmailConfig = (authConfig) => {
     const port = safePort(process.env.EMAIL_SMTP_PORT) || 587;
-    const secure = process.env.EMAIL_SECURE !== undefined
-      ? parseBool(process.env.EMAIL_SECURE, false)
-      : port === 465;
+    const secure = port === 465 ? true : (port === 587 ? false : parseBool(process.env.EMAIL_SECURE, false));
 
     const host = GMAIL_IPV4 || "smtp.gmail.com";
 
@@ -173,12 +171,11 @@ let lastVerifyAttempt = 0;
 const VERIFY_COOLDOWN_MS = 60000;
 
 const createTransporter = async () => {
+  await resolveGmailIpv4Async();
   const transport = resolveTransportConfig();
   if (transport.error) {
     return { transporter: null, mode: null, error: transport.error };
   }
-
-  await resolveGmailIpv4Async();
 
   const { host, port, secure, auth } = transport.config;
   const authType = auth?.type || "password";
@@ -186,9 +183,10 @@ const createTransporter = async () => {
   const logAuth = authType === "OAuth2"
     ? `type=OAuth2 clientId=${auth?.clientId} refreshToken=${refreshTokenSnippet}`
     : `user=${auth?.user}`;
-  const dnsInfo = GMAIL_IPV4 ? `ipv4=${GMAIL_IPV4}` : "hostname=smtp.gmail.com";
+  const resolvedInfo = GMAIL_IPV4 ? `ipv4=${GMAIL_IPV4}` : "hostname=smtp.gmail.com";
+  const usingInfo = host === GMAIL_IPV4 ? resolvedInfo : `host=${host}`;
 
-  console.log(`[email] creating transporter: mode=${transport.mode} ${dnsInfo} port=${port} secure=${secure} ${logAuth}`);
+  console.log(`[email] creating transporter: mode=${transport.mode} ${usingInfo} port=${port} secure=${secure} ${logAuth}`);
 
   const transporter = nodemailer.createTransport(transport.config);
 
