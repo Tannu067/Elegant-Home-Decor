@@ -76,27 +76,29 @@ export default function Home() {
         <meta name="description" content="Shop Premium Handcrafted Table Covers, Cushion Covers, Aprons, and Home Decor Essentials." />
       </Helmet>
       <HeroSection />
-      <section className="container section">
-        <div className="section-heading">
-          <span className="eyebrow">Curated Categories</span>
-          <h2>Textiles That Change the Room</h2>
-          <Link to="/products">View All</Link>
-        </div>
-        <div className="category-grid">
-          {categories.slice(0, 3).map((category) => (
-            <CategoryCard key={category.slug} category={category} />
-          ))}
-        </div>
-      </section>
-      <section className="band best-seller-band">
-        <div className="container section">
-          <BestSellerCarousel
-            products={bestSellers.length ? bestSellers : products}
-            title="Customer-Loved Finishing Touches"
-            eyebrow="Best Sellers"
-          />
-        </div>
-      </section>
+      <div className="home-order-wrap">
+        <section className="container section">
+          <div className="section-heading">
+            <span className="eyebrow">Curated Categories</span>
+            <h2>Textiles That Change the Room</h2>
+            <Link to="/products">View All</Link>
+          </div>
+          <div className="category-grid">
+            {categories.slice(0, 3).map((category) => (
+              <CategoryCard key={category.slug} category={category} />
+            ))}
+          </div>
+        </section>
+        <section className="band best-seller-band">
+          <div className="container section">
+            <BestSellerCarousel
+              products={bestSellers.length ? bestSellers : products}
+              title="Customer-Loved Finishing Touches"
+              eyebrow="Best Sellers"
+            />
+          </div>
+        </section>
+      </div>
       <section ref={seasonalRef} className={`container section split-offer${seasonalInView ? " visible" : ""}`}>
         <div className="seasonal-text-col">
           <span className="eyebrow seasonal-line" style={{ transitionDelay: "0s" }}>Seasonal Edit</span>

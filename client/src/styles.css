@@ -3073,7 +3073,18 @@ th {
     font-size: 0.88rem;
   }
 
-  .hero {
+.home-order-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 720px) {
+  .home-order-wrap > .best-seller-band {
+    order: -1;
+  }
+}
+
+.hero {
     min-height: auto;
     padding: 20px 0;
   }
