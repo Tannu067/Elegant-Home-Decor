@@ -813,10 +813,6 @@ textarea {
   grid-template-columns: repeat(3, 1fr);
 }
 
-.mobile-cat-collage {
-  display: none;
-}
-
 .category-card,
 .product-card,
 .testimonial,
@@ -3154,66 +3150,8 @@ th {
   .form-grid,
   .split-offer,
   .listing-toolbar,
-   .footer-grid {
+  .footer-grid {
     grid-template-columns: 1fr;
-  }
-
-  .category-grid {
-    display: none;
-  }
-
-  .mobile-cat-collage {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .collage-card {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  }
-
-  .collage-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    aspect-ratio: 1;
-  }
-
-  .collage-img-wrap {
-    overflow: hidden;
-  }
-
-  .collage-img-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .collage-text-wrap {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 12px;
-    background: var(--soft);
-    gap: 4px;
-  }
-
-  .collage-text-wrap h4 {
-    font-size: 0.9rem;
-    font-weight: 700;
-    margin: 0;
-  }
-
-  .collage-text-wrap p {
-    font-size: 0.75rem;
-    color: var(--muted);
-    margin: 0;
-    line-height: 1.4;
   }
 
   .zoom-inner {

@@ -14,37 +14,6 @@ import BestSellerCarousel from "../components/BestSellerCarousel.jsx";
 import TestimonialCard from "../components/TestimonialCard.jsx";
 import MagneticButton from "../components/MagneticButton.jsx";
 
-const COLLAGE_DATA = [
-  {
-    label: "Cushions",
-    path: "/products?category=cushion-covers",
-    images: [
-      "https://res.cloudinary.com/djligggal/image/upload/v1782654756/lucas-de-moura-b0kTwnDM1O0-unsplash_z0di7l.jpg",
-      "https://res.cloudinary.com/djligggal/image/upload/v1782654902/mariah-krafft--qOa0YYfdGo-unsplash_koitma.jpg",
-    ],
-    text: "Plush cushions transform your living space into a cozy sanctuary, adding warmth and personality to every corner.",
-  },
-  {
-    label: "Table Covers",
-    path: "/products?category=table-covers",
-    images: [
-      "https://res.cloudinary.com/djligggal/image/upload/v1782654298/nataliya-smirnova-H9mg9aDTdaQ-unsplash_nfhgus.jpg",
-      "https://res.cloudinary.com/djligggal/image/upload/v1782654653/ed-inal-Q3XVJVyJ6Y4-unsplash_phzg0h.jpg",
-      "https://res.cloudinary.com/djligggal/image/upload/v1782655229/bruno-ngarukiye-ZsmSKZOF_SA-unsplash_j9tsj7.jpg",
-    ],
-    text: "Elegant table covers set the stage for memorable meals, protecting your table while elevating your dining experience.",
-  },
-  {
-    label: "Aprons",
-    path: "/products?category=aprons",
-    images: [
-      "https://res.cloudinary.com/djligggal/image/upload/v1782655012/golden-horn-bridge-dOQeGVGNmpk-unsplash_qpgwe1.jpg",
-      "https://res.cloudinary.com/djligggal/image/upload/v1782655118/golden-horn-bridge-R_00GMyo2CE-unsplash_ynj6ji.jpg",
-    ],
-    text: "Stylish aprons blend function with fashion, making every kitchen moment feel effortless and curated.",
-  },
-];
-
 export default function Home() {
   const [categories, setCategories] = useState(fallbackCategories);
   const [products, setProducts] = useState(fallbackProducts);
@@ -117,21 +86,6 @@ export default function Home() {
           <div className="category-grid">
             {categories.slice(0, 3).map((category) => (
               <CategoryCard key={category.slug} category={category} />
-            ))}
-          </div>
-          <div className="mobile-cat-collage">
-            {COLLAGE_DATA.map((item) => (
-              <Link key={item.label} to={item.path} className="collage-card">
-                <div className="collage-grid">
-                  <div className="collage-img-wrap"><img src={item.images[0]} alt="" loading="lazy" /></div>
-                  <div className="collage-img-wrap"><img src={item.images[1]} alt="" loading="lazy" /></div>
-                  <div className="collage-img-wrap"><img src={item.images[2] || item.images[0]} alt="" loading="lazy" /></div>
-                  <div className="collage-text-wrap">
-                    <h4>{item.label}</h4>
-                    <p>{item.text}</p>
-                  </div>
-                </div>
-              </Link>
             ))}
           </div>
         </section>
