@@ -118,13 +118,19 @@ img {
 }
 
 .announcement-marquee-track {
-  display: inline-flex;
+  display: flex;
+  flex-shrink: 0;
   white-space: nowrap;
-  animation: announcement-marquee-scroll 40s linear infinite;
+  width: max-content;
+  animation-name: announcement-marquee-scroll;
+  animation-duration: 40s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
 }
 
 .announcement-item {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   padding: 9px 0;
   font-size: 0.88rem;
