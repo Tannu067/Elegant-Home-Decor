@@ -35,6 +35,7 @@ export default function Footer() {
           <p>Jaipur, Rajasthan, India</p>
         </div>
       </div>
+      <div className="footer-byline">Made by Tannu Kumari</div>
     </footer>
   );
 }

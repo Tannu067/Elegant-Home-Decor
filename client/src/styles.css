@@ -2846,7 +2846,16 @@ th {
 .footer {
   background: var(--ink);
   color: white;
-  padding: 54px 0;
+  padding: 54px 0 24px;
+}
+
+.footer-byline {
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-grid {
