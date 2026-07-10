@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useFestiveTheme } from "../context/FestiveThemeContext.jsx";
 import api from "../services/api.js";
 
-const FALLBACK_TEXT = "Free Shipping Over Rs. 2,500 | Handcrafted Fabric Decor for Everyday Elegance";
+const FALLBACK_TEXT = "Free Shipping on orders above ₹2,500 — Handcrafted Fabric Decor for Everyday Elegance";
 
 export default function TopBanner() {
   const { theme } = useFestiveTheme();
