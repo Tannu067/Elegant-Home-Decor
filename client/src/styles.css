@@ -120,21 +120,9 @@ img {
   will-change: transform;
 }
 
-@media (min-width: 721px) {
-  .announcement-track {
-    animation: none;
-  }
-}
-
 .announcement-track > span {
   flex-shrink: 0;
   font-size: 0.88rem;
-}
-
-@media (min-width: 721px) {
-  .mobile-only {
-    display: none !important;
-  }
 }
 
 @keyframes marquee-scroll {

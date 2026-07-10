@@ -35,9 +35,9 @@ export default function TopBanner() {
   return (
     <div className="top-strip announcement-bar">
       <div className="announcement-track">
-        <span className="announcement-text">{text}</span>
-        <span className="announcement-text mobile-only">{text}</span>
-        <span className="announcement-text mobile-only">{text}</span>
+        <span>{text}</span>
+        <span>{text}</span>
+        <span>{text}</span>
       </div>
     </div>
   );
