@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useFestiveTheme } from "../context/FestiveThemeContext.jsx";
 import api from "../services/api.js";
 
-const FALLBACK_TEXT = "Free Shipping on orders above ₹2,500 — Handcrafted Fabric Decor for Everyday Elegance";
+const FALLBACK_TEXT = "Free Shipping on orders above ₹2,500 — Handcrafted Fabric Décor for Everyday Elegance";
 
 export default function TopBanner() {
   const { theme } = useFestiveTheme();
@@ -30,14 +30,14 @@ export default function TopBanner() {
   }
 
   const items = loaded && announcements.length > 0 ? announcements.map((a) => a.text) : [FALLBACK_TEXT];
-  const displayText = items.join(" • ") + " • ";
+  const text = items.join("  •  ");
 
   return (
     <div className="top-strip announcement-bar">
       <div className="announcement-track">
-        <span>{displayText}</span>
-        <span>{displayText}</span>
-        <span>{displayText}</span>
+        <span className="announcement-text">{text}</span>
+        <span className="announcement-text mobile-only">{text}</span>
+        <span className="announcement-text mobile-only">{text}</span>
       </div>
     </div>
   );
